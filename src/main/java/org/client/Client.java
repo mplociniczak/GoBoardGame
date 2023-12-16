@@ -159,6 +159,7 @@ public class Client extends JFrame implements Runnable {
         while(true) {
             if(player == firstPlayer) {
                 connection.receiveCoordinates(X, Y);
+                //metoda setStone
 //                try {
 //                    connection.waitForPlayerAction(waiting);
 //                } catch (InterruptedException ex) {
