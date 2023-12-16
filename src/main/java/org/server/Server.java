@@ -32,12 +32,12 @@ public class Server {
                 new DataOutputStream(firstClientSocket.getOutputStream()).writeInt(firstPlayer);
                 System.out.println("First client connected");
 
-                //secondClientSocket = serverSocket.accept();
-                //new DataOutputStream(firstClientSocket.getOutputStream()).writeInt(secondPlayer);
-                //System.out.println("Second client connected");
+                secondClientSocket = serverSocket.accept();
+                new DataOutputStream(firstClientSocket.getOutputStream()).writeInt(secondPlayer);
+                System.out.println("Second client connected");
 
-                //GameThread currentGame = new GameThread(firstClientSocket, secondClientSocket);
-                GameThread currentGame = new GameThread(firstClientSocket);
+                GameThread currentGame = new GameThread(firstClientSocket, secondClientSocket);
+                //GameThread currentGame = new GameThread(firstClientSocket);
                 new Thread(currentGame).start();
 
                 allCurrentGames.add(currentGame);

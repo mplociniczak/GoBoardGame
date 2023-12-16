@@ -66,7 +66,7 @@ public class Client extends JFrame implements Runnable {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Implement the logic for starting a game
-                connection = new ConnectionHandler("192.168.56.1", 6666);
+                connection = new ConnectionHandler("localhost", 6666);
                 showGameBoard(19);  // Change the size as needed
             }
         });
