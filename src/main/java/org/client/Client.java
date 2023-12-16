@@ -66,7 +66,7 @@ public class Client extends JFrame implements Runnable {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Implement the logic for starting a game
-                connection = new ConnectionHandler("localhost", 6666);
+                connection = new ConnectionHandler("192.168.56.1", 6666);
                 showGameBoard(19);  // Change the size as needed
             }
         });
@@ -159,18 +159,18 @@ public class Client extends JFrame implements Runnable {
         while(true) {
             if(player == firstPlayer) {
                 connection.receiveCoordinates(X, Y);
-                try {
-                    connection.waitForPlayerAction(waiting);
-                } catch (InterruptedException ex) {
-                    //TODO: handle
-                }
+//                try {
+//                    connection.waitForPlayerAction(waiting);
+//                } catch (InterruptedException ex) {
+//                    //TODO: handle
+//                }
 
             } else if (player == secondPlayer) {
-                try {
-                    connection.waitForPlayerAction(waiting);
-                } catch (InterruptedException ex) {
-                    //TODO: handle
-                }
+//                try {
+//                    connection.waitForPlayerAction(waiting);
+//                } catch (InterruptedException ex) {
+//                    //TODO: handle
+//                }
                 connection.receiveCoordinates(X, Y);
             }
 
@@ -183,11 +183,10 @@ public class Client extends JFrame implements Runnable {
             X = e.getX();
             Y = e.getY();
             System.out.println(X + " " + Y);
-            if(myTurn) {
+           //if(myTurn) {
                 connection.sendCoordinates(X, Y);
-                myTurn = false;
-                waiting = false;
-            }
+                //myTurn = false;
+            //}
         }
     }
 

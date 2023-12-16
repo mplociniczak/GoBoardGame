@@ -12,10 +12,14 @@ public class GameThread implements Runnable {
     private int X;
     private int Y;
     private Board board;
-    public GameThread(Socket firstClientSocket, Socket secondClientSocket) {
-        this.firstClientSocket = firstClientSocket;
-        this.secondClientSocket = secondClientSocket;
-    }
+//    public GameThread(Socket firstClientSocket, Socket secondClientSocket) {
+//        this.firstClientSocket = firstClientSocket;
+//        this.secondClientSocket = secondClientSocket;
+//    }
+public GameThread(Socket firstClientSocket) {
+    this.firstClientSocket = firstClientSocket;
+    //this.secondClientSocket = secondClientSocket;
+}
     @Override
     public void run() {
 
@@ -26,8 +30,8 @@ public class GameThread implements Runnable {
             DataInputStream firstClientInput = new DataInputStream(firstClientSocket.getInputStream());
             DataOutputStream firstClientOutput = new DataOutputStream(firstClientSocket.getOutputStream());
 
-            DataInputStream secondClientInput = new DataInputStream(secondClientSocket.getInputStream());
-            DataOutputStream secondClientOutput = new DataOutputStream(secondClientSocket.getOutputStream());
+            //DataInputStream secondClientInput = new DataInputStream(secondClientSocket.getInputStream());
+            //DataOutputStream secondClientOutput = new DataOutputStream(secondClientSocket.getOutputStream());
 
             while(true) {
                 if(turn == first) {
@@ -35,18 +39,18 @@ public class GameThread implements Runnable {
                     Y = firstClientInput.readInt();
                     System.out.println(X + " " + Y);
 
-                    firstClientOutput.writeInt(X);
-                    firstClientOutput.writeInt(Y);
+                    //secondClientOutput.writeInt(X);
+                    //secondClientOutput.writeInt(Y);
                     turn = second;
                 }
 
                 if(turn == second) {
-                    X = secondClientInput.readInt();
-                    Y = secondClientInput.readInt();
+                    //X = secondClientInput.readInt();
+                    //Y = secondClientInput.readInt();
                     System.out.println(X + " " + Y);
 
-                    secondClientOutput.writeInt(X);
-                    secondClientOutput.writeInt(Y);
+                    firstClientOutput.writeInt(X);
+                    firstClientOutput.writeInt(Y);
                     turn = first;
                 }
             }
