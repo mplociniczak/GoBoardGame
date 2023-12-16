@@ -9,52 +9,48 @@ public class GameThread implements Runnable {
     private final static int first = 1;
     private final static int second = 0;
     private static int turn = first;
-
+    private int X;
+    private int Y;
     private Board board;
-
     public GameThread(Socket firstClientSocket, Socket secondClientSocket) {
         this.firstClientSocket = firstClientSocket;
         this.secondClientSocket = secondClientSocket;
-        board = new Board();
     }
     @Override
     public void run() {
 
+        //Server.allCurrentGames.add(this);
+        System.out.println("Running...");
+
         try{
-            InputStream firstClientInput = firstClientSocket.getInputStream();
-            BufferedReader firstClientRead = new BufferedReader(new InputStreamReader(firstClientInput));
+            DataInputStream firstClientInput = new DataInputStream(firstClientSocket.getInputStream());
+            DataOutputStream firstClientOutput = new DataOutputStream(firstClientSocket.getOutputStream());
 
-            InputStream secondClientInput = secondClientSocket.getInputStream();
-            BufferedReader secondClientRead = new BufferedReader(new InputStreamReader(secondClientInput));
+            DataInputStream secondClientInput = new DataInputStream(secondClientSocket.getInputStream());
+            DataOutputStream secondClientOutput = new DataOutputStream(secondClientSocket.getOutputStream());
 
-            OutputStream firstClientOutput = firstClientSocket.getOutputStream();
-            PrintWriter firstClientWrite = new PrintWriter(firstClientOutput, true);
-
-            OutputStream secondClientOutput = secondClientSocket.getOutputStream();
-            PrintWriter secondClientWrite = new PrintWriter(secondClientOutput, true);
-
-            //info to client which is which
-            firstClientWrite.println("first");
-            secondClientWrite.println("second");
-
-            String coordinates;
             while(true) {
                 if(turn == first) {
-                    //Receiving
-                    coordinates = firstClientRead.readLine();
-                    //Sending
-                    secondClientWrite.println(coordinates);
+                    X = firstClientInput.readInt();
+                    Y = firstClientInput.readInt();
+                    System.out.println(X + " " + Y);
 
-                    //board.checkIfCorrect(coordinates);
+                    firstClientOutput.writeInt(X);
+                    firstClientOutput.writeInt(Y);
                     turn = second;
                 }
 
                 if(turn == second) {
-                    coordinates = secondClientRead.readLine();
-                    firstClientWrite.println(coordinates);
+                    X = secondClientInput.readInt();
+                    Y = secondClientInput.readInt();
+                    System.out.println(X + " " + Y);
+
+                    secondClientOutput.writeInt(X);
+                    secondClientOutput.writeInt(Y);
                     turn = first;
                 }
             }
+
         } catch (IOException ex) {
             //TODO: handle
         }

@@ -1,5 +1,4 @@
 import org.junit.Test;
-import org.server.ClientTestClass;
 
 import static org.junit.Assert.assertEquals;
 
