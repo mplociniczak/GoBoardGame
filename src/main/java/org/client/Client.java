@@ -159,6 +159,7 @@ public class Client extends JFrame implements Runnable {
         while(true) {
             if(player == firstPlayer) {
                 connection.receiveCoordinates(X, Y);
+                //metoda setStone
 //                try {
 //                    connection.waitForPlayerAction(waiting);
 //                } catch (InterruptedException ex) {
@@ -180,9 +181,15 @@ public class Client extends JFrame implements Runnable {
     private class ClickListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
-            X = e.getX();
-            Y = e.getY();
+            X = Math.round((float) (e.getY() - BORDER_SIZE)
+                    / TILE_SIZE);
+            Y = Math.round((float) (e.getX() - BORDER_SIZE)
+                    / TILE_SIZE);
             System.out.println(X + " " + Y);
+            // Check wherever it's valid
+            if (row >= SIZE || col >= SIZE || row < 0 || col < 0) {
+                return;
+            }
            //if(myTurn) {
                 connection.sendCoordinates(X, Y);
                 //myTurn = false;
