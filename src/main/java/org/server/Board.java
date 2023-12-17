@@ -1,13 +1,9 @@
 package org.server;
 
 public class Board {
-    FieldState[][] fields = new FieldState[19][19];
+    Stone[][] fields;
     public Board(){
-        for(int i = 0; i < 19; i++) {
-            for(int j = 0; j < 19; j++) {
-                fields[i][j] = FieldState.EMPTY;
-            }
-        }
+        fields = new Stone[19][19];
     }
     public boolean checkIfMoveCorrect(int X, int Y){
         //TODO: implement
@@ -15,10 +11,10 @@ public class Board {
     }
 
     public void placeBlackStone(int X, int Y){
-        fields[X][Y] = FieldState.BLACK;
+        fields[X][Y].placeStone(StoneColor.BLACK);
     }
     public void placeWhiteStone(int X, int Y){
-        fields[X][Y] = FieldState.WHITE;
+        fields[X][Y].placeStone(StoneColor.WHITE);
     }
 }
 
