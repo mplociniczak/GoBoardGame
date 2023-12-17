@@ -66,7 +66,7 @@ public class Client extends JFrame implements Runnable {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Implement the logic for starting a game
-                connection = new ConnectionHandler("localhost", 6666);
+                connection = new ConnectionHandler("100.77.36.44", 6670);
                 showGameBoard(19);  // Change the size as needed
             }
         });
@@ -181,16 +181,18 @@ public class Client extends JFrame implements Runnable {
     private class ClickListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
-            X = Math.round((float) (e.getY() - BORDER_SIZE)
-                    / TILE_SIZE);
-            Y = Math.round((float) (e.getX() - BORDER_SIZE)
-                    / TILE_SIZE);
-            System.out.println(X + " " + Y);
-            // Check wherever it's valid
-            if (row >= SIZE || col >= SIZE || row < 0 || col < 0) {
-                return;
-            }
+//            X = Math.round((float) (e.getY() - BORDER_SIZE)
+//                    / TILE_SIZE);
+//            Y = Math.round((float) (e.getX() - BORDER_SIZE)
+//                    / TILE_SIZE);
+//            System.out.println(X + " " + Y);
+//            // Check wherever it's valid
+//            if (row >= SIZE || col >= SIZE || row < 0 || col < 0) {
+//                return;
+//            }
            //if(myTurn) {
+                X = e.getX();
+                Y = e.getY();
                 connection.sendCoordinates(X, Y);
                 //myTurn = false;
             //}
