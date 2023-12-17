@@ -1,4 +1,8 @@
 package org.client;
+import org.server.StoneColor;
+import org.server.State;
+import org.server.Stone;
+import org.server.StoneComponent;
 
 import javax.swing.*;
 import java.awt.*;
@@ -7,9 +11,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-
 public class Client extends JFrame implements Runnable {
-    ConnectionHandler connection;
+    private ConnectionHandler connection;
     private JButton connectButton;
     private JButton joinGameButton;
     private JButton startGameButton;
@@ -17,25 +20,29 @@ public class Client extends JFrame implements Runnable {
     private JPanel gameBoardPanel;
     private JSplitPane splitPane;
     private JPanel scorePanel;
-    JLabel ter_B;  //Territory
-    JLabel ter_W;
-    JLabel pris_B;  //Prisoners
-    JLabel pris_W;
-    JLabel scr_B;  //Score
-    JLabel scr_W;
-    JButton pass;
+    private JLabel ter_B;  //Territory
+    private JLabel ter_W;
+    private JLabel pris_B;  //Prisoners
+    private JLabel pris_W;
+    private JLabel scr_B;  //Score
+    private JLabel scr_W;
+    private JButton pass;
     private int X;
     private int Y;
     private boolean myTurn = true;
     private boolean waiting = true;
     private final static int firstPlayer = 1;
     private final static int secondPlayer = 2;
+
+    private Stone[][] board; // Dwuwymiarowa tablica reprezentująca planszę
+
     public Client() {
         setTitle("Go Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(400, 200);
 
         createUI();
+        initializeBoard();
     }
 
     private void createUI() {
@@ -76,6 +83,18 @@ public class Client extends JFrame implements Runnable {
         mainPanel.add(startGameButton);
 
         add(mainPanel);
+    }
+
+    private void initializeBoard() {
+        int size = 19; // Rozmiar planszy
+
+        board = new Stone[size][size];
+
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                board[i][j] = new Stone();
+            }
+        }
     }
 
     private void showGameBoard(int size) {
@@ -156,8 +175,8 @@ public class Client extends JFrame implements Runnable {
     @Override
     public void run() {
         int player = connection.receiveTurn();
-        while(true) {
-            if(player == firstPlayer) {
+        while (true) {
+            if (player == firstPlayer) {
                 Point receivedCoordinates = connection.receiveCoordinates();
                 X = (int) receivedCoordinates.getX();
                 Y = (int) receivedCoordinates.getY();
@@ -195,19 +214,64 @@ public class Client extends JFrame implements Runnable {
         return new Point(row, col);
     }
 
-
     private class ClickListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
-            Point boardIndices = convertCoordinatesToBoardIndex(e.getX(), e.getY(), 19); // Change the size as needed
+            Point boardIndices = convertCoordinatesToBoardIndex(e.getX(), e.getY(), 19);
             int row = (int) boardIndices.getX();
             int col = (int) boardIndices.getY();
-            System.out.println(row + "  " + col);
-            connection.sendCoordinates(row, col);
-                //myTurn = false;
-            //}
+            System.out.println(row + " " + col);
+
+            if (board[row][col].getState() == State.EMPTY) {
+                StoneColor currentColor = myTurn ? StoneColor.BLACK : StoneColor.WHITE;
+                board[row][col].placeStone(currentColor);
+
+                // Aktualizacja wyglądu graficznego
+                updateStoneGraphics(row, col, currentColor);
+
+                // Dodaj kod do przesłania informacji o ruchu do serwera
+                connection.sendCoordinates(row, col);
+
+                // Oznacz, że teraz jest ruch przeciwnika
+                myTurn = false;
+            } else {
+                JOptionPane.showMessageDialog(null, "This intersection is already occupied.");
+            }
         }
     }
+
+    private void updateStoneGraphics(int row, int col, StoneColor color) {
+        // Pobierz centralny kwadrat, który znajduje się na przecięciu czterech sąsiadujących kwadratów
+        JPanel centralSquare = (JPanel) gameBoardPanel.getComponent(row * 19 + col);
+
+        // Usunięcie wcześniejszych komponentów z centralnego kwadratu
+        centralSquare.removeAll();
+
+        // Oblicz położenie do narysowania koła na środku przecięcia
+        int tileSize = gameBoardPanel.getWidth() / 19; // Zakładając, że 19 to rozmiar planszy
+        int centerX = col * tileSize + tileSize / 2;
+        int centerY = row * tileSize + tileSize / 2;
+
+        // Dodanie nowego komponentu reprezentującego kamień jako okrąg na środku przecięcia
+        StoneComponent stoneComponent = new StoneComponent(color);
+        int componentSize = stoneComponent.getPreferredSize().width;
+
+        // Ustawienie rozmiaru kamienia
+        stoneComponent.setSize(componentSize, componentSize);
+
+        // Ustawienie pozycji kamienia na środku przecięcia
+        int componentX = centerX - componentSize / 2;
+        int componentY = centerY - componentSize / 2;
+
+        stoneComponent.setBounds(componentX, componentY, componentSize, componentSize);
+        centralSquare.add(stoneComponent);
+
+        centralSquare.revalidate();
+        centralSquare.repaint();
+    }
+
+
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
