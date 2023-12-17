@@ -7,7 +7,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class Server {
-    private static final int port = 6666;
+    private static final int port = 6670;
     private static final int firstPlayer = 1;
     private static final int secondPlayer = 2;
     public static ArrayList<GameThread> allCurrentGames = new ArrayList<>();

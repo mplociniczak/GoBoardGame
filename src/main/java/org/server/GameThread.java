@@ -15,6 +15,7 @@ public class GameThread implements Runnable {
     public GameThread(Socket firstClientSocket, Socket secondClientSocket) {
         this.firstClientSocket = firstClientSocket;
         this.secondClientSocket = secondClientSocket;
+        board = new Board();
     }
 //public GameThread(Socket firstClientSocket) {
 //    this.firstClientSocket = firstClientSocket;
@@ -35,23 +36,41 @@ public class GameThread implements Runnable {
 
             while(true) {
                 if(turn == first) {
+
                     X = firstClientInput.readInt();
                     Y = firstClientInput.readInt();
-                    System.out.println(X + " " + Y);
 
-                    secondClientOutput.writeInt(X);
-                    secondClientOutput.writeInt(Y);
-                    turn = second;
+                    if(board.checkIfMoveCorrect(X, Y)){
+
+                        board.placeWhiteStone(X, Y);
+
+                        secondClientOutput.writeInt(X);
+                        secondClientOutput.writeInt(Y);
+
+                        firstClientOutput.writeInt(X);
+                        firstClientOutput.writeInt(Y);
+
+                        turn = second;
+                    }
                 }
 
                 if(turn == second) {
+
                     X = secondClientInput.readInt();
                     Y = secondClientInput.readInt();
-                    System.out.println(X + " " + Y);
 
-                    firstClientOutput.writeInt(X);
-                    firstClientOutput.writeInt(Y);
-                    turn = first;
+                    if(board.checkIfMoveCorrect(X, Y)){
+
+                        board.placeBlackStone(X, Y);
+
+                        firstClientOutput.writeInt(X);
+                        firstClientOutput.writeInt(Y);
+
+                        secondClientOutput.writeInt(X);
+                        secondClientOutput.writeInt(Y);
+
+                        turn = first;
+                    }
                 }
             }
 
