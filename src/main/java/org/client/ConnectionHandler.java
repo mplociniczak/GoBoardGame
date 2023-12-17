@@ -36,7 +36,7 @@ public class ConnectionHandler {
         }
     }
 
-    public Point  receiveCoordinates() {
+    public Point receiveCoordinates() {
         try{
             X = input.readInt();
             Y = input.readInt();

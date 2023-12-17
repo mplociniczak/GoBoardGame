@@ -180,6 +180,14 @@ public class Client extends JFrame implements Runnable {
                 Point receivedCoordinates = connection.receiveCoordinates();
                 X = (int) receivedCoordinates.getX();
                 Y = (int) receivedCoordinates.getY();
+                board[X][Y].placeStone(StoneColor.WHITE);
+                updateStoneGraphics(X, Y, StoneColor.WHITE);
+
+                receivedCoordinates = connection.receiveCoordinates();
+                X = (int) receivedCoordinates.getX();
+                Y = (int) receivedCoordinates.getY();
+                board[X][Y].placeStone(StoneColor.BLACK);
+                updateStoneGraphics(X, Y, StoneColor.BLACK);
                 //metoda setStone
 //                try {
 //                    connection.waitForPlayerAction(waiting);
@@ -196,8 +204,15 @@ public class Client extends JFrame implements Runnable {
                 Point receivedCoordinates = connection.receiveCoordinates();
                 X = (int) receivedCoordinates.getX();
                 Y = (int) receivedCoordinates.getY();
-            }
+                board[X][Y].placeStone(StoneColor.BLACK);
+                updateStoneGraphics(X, Y, StoneColor.BLACK);
 
+                receivedCoordinates = connection.receiveCoordinates();
+                X = (int) receivedCoordinates.getX();
+                Y = (int) receivedCoordinates.getY();
+                board[X][Y].placeStone(StoneColor.WHITE);
+                updateStoneGraphics(X, Y, StoneColor.WHITE);
+            }
         }
     }
 
@@ -217,26 +232,21 @@ public class Client extends JFrame implements Runnable {
     private class ClickListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
-            Point boardIndices = convertCoordinatesToBoardIndex(e.getX(), e.getY(), 19);
-            int row = (int) boardIndices.getX();
-            int col = (int) boardIndices.getY();
-            System.out.println(row + " " + col);
+            //if(myTurn){
+                Point boardIndices = convertCoordinatesToBoardIndex(e.getX(), e.getY(), 19);
+                int row = (int) boardIndices.getX();
+                int col = (int) boardIndices.getY();
+                System.out.println(row + " " + col);
 
-            if (board[row][col].getState() == State.EMPTY) {
-                StoneColor currentColor = myTurn ? StoneColor.BLACK : StoneColor.WHITE;
-                board[row][col].placeStone(currentColor);
-
-                // Aktualizacja wyglądu graficznego
-                updateStoneGraphics(row, col, currentColor);
-
-                // Dodaj kod do przesłania informacji o ruchu do serwera
                 connection.sendCoordinates(row, col);
 
-                // Oznacz, że teraz jest ruch przeciwnika
-                myTurn = false;
-            } else {
-                JOptionPane.showMessageDialog(null, "This intersection is already occupied.");
-            }
+                //if (board[row][col].getState() == State.EMPTY) {
+                    // Oznacz, że teraz jest ruch przeciwnika
+                    // = false;
+                //} else {
+                    //JOptionPane.showMessageDialog(null, "This intersection is already occupied.");
+                //}
+            //}
         }
     }
 
