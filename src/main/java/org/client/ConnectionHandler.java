@@ -1,5 +1,6 @@
 package org.client;
 
+import java.awt.*;
 import java.io.*;
 import java.net.Socket;
 
@@ -12,16 +13,20 @@ public class ConnectionHandler {
 
     public ConnectionHandler(String address, int port) {
         try {
+            System.out.println("Connecting to server: " + address + ":" + port);
             socket = new Socket(address, port);
 
             input = new DataInputStream(socket.getInputStream());
             output = new DataOutputStream(socket.getOutputStream());
 
-        } catch (IOException ex) {
-            //TODO: handle
-        }
+            System.out.println("Connection successful!");
 
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            // TODO: handle
+        }
     }
+
     public void sendCoordinates(int X, int Y){
         try{
             output.writeInt(X);
@@ -31,12 +36,15 @@ public class ConnectionHandler {
         }
     }
 
-    public void receiveCoordinates(int X, int Y) {
+    public Point  receiveCoordinates() {
         try{
             X = input.readInt();
             Y = input.readInt();
+            return new Point(X, Y);
         } catch (IOException ex) {
-            //TODO: handle
+            // Handle the exception properly
+            ex.printStackTrace();
+            return null;
         }
     }
     public int receiveTurn() {

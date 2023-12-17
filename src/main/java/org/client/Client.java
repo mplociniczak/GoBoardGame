@@ -66,7 +66,7 @@ public class Client extends JFrame implements Runnable {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Implement the logic for starting a game
-                connection = new ConnectionHandler("100.77.36.44", 6670);
+                connection = new ConnectionHandler("192.168.56.1", 6670);
                 showGameBoard(19);  // Change the size as needed
             }
         });
@@ -158,7 +158,9 @@ public class Client extends JFrame implements Runnable {
         int player = connection.receiveTurn();
         while(true) {
             if(player == firstPlayer) {
-                connection.receiveCoordinates(X, Y);
+                Point receivedCoordinates = connection.receiveCoordinates();
+                X = (int) receivedCoordinates.getX();
+                Y = (int) receivedCoordinates.getY();
                 //metoda setStone
 //                try {
 //                    connection.waitForPlayerAction(waiting);
@@ -172,28 +174,36 @@ public class Client extends JFrame implements Runnable {
 //                } catch (InterruptedException ex) {
 //                    //TODO: handle
 //                }
-                connection.receiveCoordinates(X, Y);
+                Point receivedCoordinates = connection.receiveCoordinates();
+                X = (int) receivedCoordinates.getX();
+                Y = (int) receivedCoordinates.getY();
             }
 
         }
     }
 
+    private Point convertCoordinatesToBoardIndex(int x, int y, int boardSize) {
+        int tileSize = gameBoardPanel.getWidth() / boardSize;
+
+        int row = y / tileSize;
+        int col = x / tileSize;
+
+        // Ensure that the indices are within the valid range
+        row = Math.max(0, Math.min(row, boardSize - 1));
+        col = Math.max(0, Math.min(col, boardSize - 1));
+
+        return new Point(row, col);
+    }
+
+
     private class ClickListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
-//            X = Math.round((float) (e.getY() - BORDER_SIZE)
-//                    / TILE_SIZE);
-//            Y = Math.round((float) (e.getX() - BORDER_SIZE)
-//                    / TILE_SIZE);
-//            System.out.println(X + " " + Y);
-//            // Check wherever it's valid
-//            if (row >= SIZE || col >= SIZE || row < 0 || col < 0) {
-//                return;
-//            }
-           //if(myTurn) {
-                X = e.getX();
-                Y = e.getY();
-                connection.sendCoordinates(X, Y);
+            Point boardIndices = convertCoordinatesToBoardIndex(e.getX(), e.getY(), 19); // Change the size as needed
+            int row = (int) boardIndices.getX();
+            int col = (int) boardIndices.getY();
+            System.out.println(row + "  " + col);
+            connection.sendCoordinates(row, col);
                 //myTurn = false;
             //}
         }
