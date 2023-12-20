@@ -71,7 +71,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
                     }
                 };
 
-                square.setBackground(Color.WHITE);
+                square.setBackground(Color.ORANGE);
 
                 /* Zmiana koloru co drugiego pola
                 if ((i + j) % 2 == 0) {
@@ -89,7 +89,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
 
 
-    ter_B = new JLabel();
+        ter_B = new JLabel();
         ter_W = new JLabel();
         pris_B = new JLabel();
         pris_W = new JLabel();
