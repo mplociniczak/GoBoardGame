@@ -1,6 +1,6 @@
 package org.server;
 
-public enum State {
+public enum IntersectionState {
     EMPTY,
     OCCUPIED
 }

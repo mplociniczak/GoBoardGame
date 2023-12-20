@@ -1,5 +1,7 @@
 package org.server;
 
+import org.server.StoneColor;
+
 import javax.swing.*;
 import java.awt.*;
 

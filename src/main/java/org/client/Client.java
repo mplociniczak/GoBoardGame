@@ -1,6 +1,5 @@
 package org.client;
 import org.server.StoneColor;
-import org.server.State;
 import org.server.Stone;
 import org.server.StoneComponent;
 
@@ -11,6 +10,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
+/**
+ * Doesn't communicate with server - check what can we improve
+ */
 public class Client extends JFrame implements Runnable {
     private ConnectionHandler connection;
     private JButton connectButton;
@@ -27,12 +29,11 @@ public class Client extends JFrame implements Runnable {
     private JLabel scr_B;  //Score
     private JLabel scr_W;
     private JButton pass;
-    private int X;
-    private int Y;
     private boolean myTurn = true;
     private boolean waiting = true;
     private final static int firstPlayer = 1;
     private final static int secondPlayer = 2;
+    private final static int size = 19;
 
     private Stone[][] board; // Dwuwymiarowa tablica reprezentująca planszę
 
@@ -73,8 +74,8 @@ public class Client extends JFrame implements Runnable {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Implement the logic for starting a game
-                connection = new ConnectionHandler("192.168.56.1", 6670);
-                showGameBoard(19);  // Change the size as needed
+                connection = new ConnectionHandler("localhost", 6670);
+                showGameBoard(size);  // Change the size as needed
             }
         });
 
@@ -86,7 +87,6 @@ public class Client extends JFrame implements Runnable {
     }
 
     private void initializeBoard() {
-        int size = 19; // Rozmiar planszy
 
         board = new Stone[size][size];
 
@@ -171,60 +171,85 @@ public class Client extends JFrame implements Runnable {
         gameBoardFrame.setResizable(false);
         gameBoardFrame.setVisible(true);
     }
+    private void receiveCoordinatesAndPlaceStone(StoneColor color){
+        Point receivedCoordinates = connection.receiveCoordinates();
+        int X = (int) receivedCoordinates.getX();
+        int Y = (int) receivedCoordinates.getY();
+        System.out.println(X + " " + Y);
 
+        //Incorrect move
+        if(X == -1 && Y == -1) {
+            System.out.println("Incorrect move!");
+        } else {
+            board[X][Y].placeStone(color);
+            updateStoneGraphics(X, Y, color);
+        }
+    }
     @Override
     public void run() {
         int player = connection.receiveTurn();
+        System.out.println(player);
+
+        Point receivedCoordinates;
+        int X = 0;
+        int Y = 0;
+
         while (true) {
             if (player == firstPlayer) {
-                Point receivedCoordinates = connection.receiveCoordinates();
-                X = (int) receivedCoordinates.getX();
-                Y = (int) receivedCoordinates.getY();
-                board[X][Y].placeStone(StoneColor.WHITE);
-                updateStoneGraphics(X, Y, StoneColor.WHITE);
-
+                //first player's move confirmation
+                //receiveCoordinatesAndPlaceStone(StoneColor.WHITE);
+                System.out.println("First player waiting...");
+                try {
+                    connection.waitForPlayerAction(waiting);
+                } catch (InterruptedException ex) {
+                    //TODO: handle
+                }
                 receivedCoordinates = connection.receiveCoordinates();
                 X = (int) receivedCoordinates.getX();
                 Y = (int) receivedCoordinates.getY();
-                board[X][Y].placeStone(StoneColor.BLACK);
+                updateStoneGraphics(X, Y, StoneColor.WHITE);
+                System.out.println("Board updated!");
+
+                //second player's move
+                //receiveCoordinatesAndPlaceStone(StoneColor.BLACK);
+                receivedCoordinates = connection.receiveCoordinates();
+                X = (int) receivedCoordinates.getX();
+                Y = (int) receivedCoordinates.getY();
                 updateStoneGraphics(X, Y, StoneColor.BLACK);
-                //metoda setStone
-//                try {
-//                    connection.waitForPlayerAction(waiting);
-//                } catch (InterruptedException ex) {
-//                    //TODO: handle
-//                }
+
 
             } else if (player == secondPlayer) {
-//                try {
-//                    connection.waitForPlayerAction(waiting);
-//                } catch (InterruptedException ex) {
-//                    //TODO: handle
-//                }
-                Point receivedCoordinates = connection.receiveCoordinates();
-                X = (int) receivedCoordinates.getX();
-                Y = (int) receivedCoordinates.getY();
-                board[X][Y].placeStone(StoneColor.BLACK);
-                updateStoneGraphics(X, Y, StoneColor.BLACK);
-
+                //first player's move confirmation
+                //receiveCoordinatesAndPlaceStone(StoneColor.BLACK);
                 receivedCoordinates = connection.receiveCoordinates();
                 X = (int) receivedCoordinates.getX();
                 Y = (int) receivedCoordinates.getY();
-                board[X][Y].placeStone(StoneColor.WHITE);
                 updateStoneGraphics(X, Y, StoneColor.WHITE);
+
+                try {
+                    connection.waitForPlayerAction(waiting);
+                } catch (InterruptedException ex) {
+                    //TODO: handle
+                }
+                //second player's move
+                //receiveCoordinatesAndPlaceStone(StoneColor.WHITE);
+                receivedCoordinates = connection.receiveCoordinates();
+                X = (int) receivedCoordinates.getX();
+                Y = (int) receivedCoordinates.getY();
+                updateStoneGraphics(X, Y, StoneColor.BLACK);
+
             }
         }
     }
-
-    private Point convertCoordinatesToBoardIndex(int x, int y, int boardSize) {
-        int tileSize = gameBoardPanel.getWidth() / boardSize;
+    private Point convertCoordinatesToBoardIndex(int x, int y) {
+        int tileSize = gameBoardPanel.getWidth() / size;
 
         int row = y / tileSize;
         int col = x / tileSize;
 
         // Ensure that the indices are within the valid range
-        row = Math.max(0, Math.min(row, boardSize - 1));
-        col = Math.max(0, Math.min(col, boardSize - 1));
+        row = Math.max(0, Math.min(row, size - 1));
+        col = Math.max(0, Math.min(col, size - 1));
 
         return new Point(row, col);
     }
@@ -233,19 +258,10 @@ public class Client extends JFrame implements Runnable {
         @Override
         public void mouseClicked(MouseEvent e) {
             //if(myTurn){
-                Point boardIndices = convertCoordinatesToBoardIndex(e.getX(), e.getY(), 19);
-                int row = (int) boardIndices.getX();
-                int col = (int) boardIndices.getY();
-                System.out.println(row + " " + col);
-
-                connection.sendCoordinates(row, col);
-
-                //if (board[row][col].getState() == State.EMPTY) {
-                    // Oznacz, że teraz jest ruch przeciwnika
-                    // = false;
-                //} else {
-                    //JOptionPane.showMessageDialog(null, "This intersection is already occupied.");
-                //}
+                Point boardIndices = convertCoordinatesToBoardIndex(e.getX(), e.getY());
+                int X = (int) boardIndices.getX();
+                int Y = (int) boardIndices.getY();
+                connection.sendCoordinates(X, Y);
             //}
         }
     }
@@ -258,7 +274,7 @@ public class Client extends JFrame implements Runnable {
         centralSquare.removeAll();
 
         // Oblicz położenie do narysowania koła na środku przecięcia
-        int tileSize = gameBoardPanel.getWidth() / 19; // Zakładając, że 19 to rozmiar planszy
+        int tileSize = gameBoardPanel.getWidth() / size;
         int centerX = col * tileSize + tileSize / 2;
         int centerY = row * tileSize + tileSize / 2;
 
@@ -278,18 +294,5 @@ public class Client extends JFrame implements Runnable {
 
         centralSquare.revalidate();
         centralSquare.repaint();
-    }
-
-
-
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            @Override
-            public void run() {
-                Client gui = new Client();
-                gui.setVisible(true);
-            }
-        });
     }
 }

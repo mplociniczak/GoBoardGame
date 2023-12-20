@@ -8,8 +8,6 @@ public class ConnectionHandler {
     private Socket socket = null;
     private DataInputStream input;
     private DataOutputStream output;
-    private int X;
-    private int Y;
 
     public ConnectionHandler(String address, int port) {
         try {
@@ -38,8 +36,9 @@ public class ConnectionHandler {
 
     public Point receiveCoordinates() {
         try{
-            X = input.readInt();
-            Y = input.readInt();
+            int X = input.readInt();
+            int Y = input.readInt();
+            System.out.println("Coordinates: " + X + " " + Y);
             return new Point(X, Y);
         } catch (IOException ex) {
             // Handle the exception properly
@@ -49,7 +48,9 @@ public class ConnectionHandler {
     }
     public int receiveTurn() {
         try{
-            return input.readInt();
+            int turn =  input.readInt();
+            System.out.println(turn);
+            return turn;
         } catch (IOException ex) {
             ex.getMessage();
         }

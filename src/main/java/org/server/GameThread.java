@@ -1,5 +1,6 @@
 package org.server;
 
+import java.awt.*;
 import java.io.*;
 import java.net.Socket;
 
@@ -7,10 +8,8 @@ public class GameThread implements Runnable {
     Socket firstClientSocket;
     Socket secondClientSocket;
     private final static int first = 1;
-    private final static int second = 0;
+    private final static int second = 2;
     private static int turn = first;
-    private int X;
-    private int Y;
     private Board board;
     public GameThread(Socket firstClientSocket, Socket secondClientSocket) {
         this.firstClientSocket = firstClientSocket;
@@ -21,10 +20,17 @@ public class GameThread implements Runnable {
 //    this.firstClientSocket = firstClientSocket;
 //    //this.secondClientSocket = secondClientSocket;
 //}
+    private void sendMove(DataOutputStream out, int X, int Y) throws IOException {
+        out.writeInt(X);
+        out.writeInt(Y);
+    }
     @Override
     public void run() {
 
-        //Server.allCurrentGames.add(this);
+        int X = 0;
+        int Y = 0;
+
+        Server.addGame(this);
         System.out.println("Running...");
 
         try{
@@ -33,6 +39,9 @@ public class GameThread implements Runnable {
 
             DataInputStream secondClientInput = new DataInputStream(secondClientSocket.getInputStream());
             DataOutputStream secondClientOutput = new DataOutputStream(secondClientSocket.getOutputStream());
+
+            firstClientOutput.writeInt(first);
+            secondClientOutput.writeInt(second);
 
             while(true) {
                 if(turn == first) {
@@ -44,13 +53,13 @@ public class GameThread implements Runnable {
 
                         board.placeWhiteStone(X, Y);
 
-                        secondClientOutput.writeInt(X);
-                        secondClientOutput.writeInt(Y);
-
-                        firstClientOutput.writeInt(X);
-                        firstClientOutput.writeInt(Y);
+                        sendMove(secondClientOutput, X, Y);
+                        sendMove(firstClientOutput, X, Y);
+                        System.out.println("First turn: " + X + " " + Y);
 
                         turn = second;
+                    } else {
+                        sendMove(firstClientOutput, -1, -1);
                     }
                 }
 
@@ -63,13 +72,13 @@ public class GameThread implements Runnable {
 
                         board.placeBlackStone(X, Y);
 
-                        firstClientOutput.writeInt(X);
-                        firstClientOutput.writeInt(Y);
-
-                        secondClientOutput.writeInt(X);
-                        secondClientOutput.writeInt(Y);
+                        sendMove(firstClientOutput, X, Y);
+                        sendMove(secondClientOutput, X, Y);
+                        System.out.println("Second turn: " + X + " " + Y);
 
                         turn = first;
+                    } else {
+                        sendMove(secondClientOutput, -1, -1);
                     }
                 }
             }

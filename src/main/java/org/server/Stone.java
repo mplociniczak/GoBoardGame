@@ -1,20 +1,18 @@
 package org.server;
 
-import org.server.StoneColor;
-
 public class Stone {
     private StoneColor color;
-    private State state;
+    private IntersectionState intersectionState;
 
     public Stone() {
         this.color = null;
-        this.state = State.EMPTY;
+        this.intersectionState = IntersectionState.EMPTY;
     }
 
     public void placeStone(StoneColor color) {
-        if (state == State.EMPTY) {
+        if (intersectionState == IntersectionState.EMPTY) {
             this.color = color;
-            this.state = State.OCCUPIED;
+            this.intersectionState = IntersectionState.OCCUPIED;
         } else {
             throw new IllegalStateException("The intersection is already occupied.");
         }
@@ -24,7 +22,7 @@ public class Stone {
         return color;
     }
 
-    public State getState() {
-        return state;
+    public IntersectionState getState() {
+        return intersectionState;
     }
 }
