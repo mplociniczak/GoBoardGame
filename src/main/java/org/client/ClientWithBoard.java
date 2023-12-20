@@ -35,13 +35,13 @@ public class ClientWithBoard extends JFrame implements Runnable {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(900, 550);
 
-        connection = new ConnectionHandler("localhost", 6670);
+        connection = new ConnectionHandler("localhost", 6680);
 
         createUI();
         setVisible(true);
     }
 
-    private void createUI(){
+    private void createUI() {
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerSize(0);
 
@@ -51,34 +51,45 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
         gameBoardPanel.addMouseListener(new ClickListener());
 
-        //board = new JPanel[19][19];
-
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
-                JPanel square = new JPanel();
-                square.setBackground(Color.BLUE);
-                square.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-                square.setPreferredSize(new Dimension(25, 25));
+                JPanel square = new JPanel() {
 
-                //board = new JPanel[i][j];
-                //board[i][j].setBackground(Color.BLUE);
-                //board[i][j].setBorder(BorderFactory.createLineBorder(Color.BLACK));
-                //board[i][j].setPreferredSize(new Dimension(25, 25));
+                    @Override
+                    protected void paintComponent(Graphics g) {
+                        super.paintComponent(g);
 
-                // zmiana koloru co drugiego pola
+                        Graphics2D g2d = (Graphics2D) g;
+                        g2d.setColor(Color.BLACK);
+
+                        // Grubsza linia pionowa na środku kwadratu
+                        g2d.setStroke(new BasicStroke(2.0f));
+                        g2d.drawLine(getWidth() / 2, 0, getWidth() / 2, getHeight());
+
+                        // Grubsza linia pozioma na środku kwadratu
+                        g2d.drawLine(0, getHeight() / 2, getWidth(), getHeight() / 2);
+                    }
+                };
+
+                square.setBackground(Color.WHITE);
+
+                /* Zmiana koloru co drugiego pola
                 if ((i + j) % 2 == 0) {
-                    //board[i][j].setBackground(Color.GREEN);
-                    square.setBackground(Color.GREEN);
+                    square.setBackground(Color.ORANGE);
                 }
 
-                //gameBoardPanel.add(board[i][j]);
+                 */
+                square.setPreferredSize(new Dimension(25, 25));
+
                 gameBoardPanel.add(square);
             }
         }
 
         splitPane.setLeftComponent(gameBoardPanel);
 
-        ter_B = new JLabel();
+
+
+    ter_B = new JLabel();
         ter_W = new JLabel();
         pris_B = new JLabel();
         pris_W = new JLabel();
