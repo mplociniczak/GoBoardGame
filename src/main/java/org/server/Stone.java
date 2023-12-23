@@ -25,4 +25,13 @@ public class Stone {
     public IntersectionState getState() {
         return intersectionState;
     }
+
+    public void removeStone() {
+        if (intersectionState == IntersectionState.OCCUPIED) {
+            this.color = null;
+            this.intersectionState = IntersectionState.EMPTY;
+        } else {
+            throw new IllegalStateException("No stone to remove at this intersection.");
+        }
+    }
 }

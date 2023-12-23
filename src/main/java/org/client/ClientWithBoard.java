@@ -35,7 +35,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(900, 550);
 
-        connection = new ConnectionHandler("localhost", 6680);
+        connection = new ConnectionHandler("localhost", 6660);
 
         createUI();
         setVisible(true);
