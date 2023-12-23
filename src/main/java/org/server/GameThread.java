@@ -7,8 +7,8 @@ import java.net.Socket;
 public class GameThread implements Runnable {
     Socket firstClientSocket;
     Socket secondClientSocket;
-    private final static int first = 1;
-    private final static int second = 2;
+    public final static int first = 1;
+    public final static int second = 2;
     private static int turn = first;
     private Board board;
     public GameThread(Socket firstClientSocket, Socket secondClientSocket) {
@@ -24,6 +24,15 @@ public class GameThread implements Runnable {
         out.writeInt(X);
         out.writeInt(Y);
     }
+
+    public static int getTurn() {
+        return turn;
+    }
+
+    public static void setTurn(int newTurn) {
+        turn = newTurn;
+    }
+
     @Override
     public void run() {
 
@@ -43,14 +52,12 @@ public class GameThread implements Runnable {
             firstClientOutput.writeInt(first);
             secondClientOutput.writeInt(second);
 
-            while(true) {
-                if(turn == first) {
-
+            while (true) {
+                if (turn == first) {
                     X = firstClientInput.readInt();
                     Y = firstClientInput.readInt();
 
-                    if(board.checkIfMoveCorrect(X, Y)){
-
+                    if (board.isMoveValidForFirstPlayer(X, Y)) {
                         board.placeWhiteStone(X, Y);
 
                         sendMove(secondClientOutput, X, Y);
@@ -63,13 +70,11 @@ public class GameThread implements Runnable {
                     }
                 }
 
-                if(turn == second) {
-
+                if (turn == second) {
                     X = secondClientInput.readInt();
                     Y = secondClientInput.readInt();
 
-                    if(board.checkIfMoveCorrect(X, Y)){
-
+                    if (board.isMoveValidForSecondPlayer(X, Y)) {
                         board.placeBlackStone(X, Y);
 
                         sendMove(firstClientOutput, X, Y);

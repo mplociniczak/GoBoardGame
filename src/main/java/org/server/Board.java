@@ -5,8 +5,13 @@ import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.server.GameThread.first;
+import static org.server.GameThread.second;
+
 public class Board {
-    Stone[][] fields;
+    private int turn;  // zmienna turn do przechowywania aktualnej tury
+    public Stone[][] fields;
+    private Set<String> previousBoardStates;
     public Board(){
         fields = new Stone[19][19];
         for (int i = 0; i < 19; i++) {
@@ -14,13 +19,64 @@ public class Board {
                 fields[i][j] = new Stone();
             }
         }
+        previousBoardStates = new HashSet<>();
+        turn = 1;  // Ustaw startową turę
     }
+
+    // metoda do uzyskiwania aktualnej tury
+    public int getTurn() {
+        return turn;
+    }
+
+    // metoda do ustawiania nowej tury
+    public void setTurn(int newTurn) {
+        this.turn = newTurn;
+    }
+
     public boolean checkIfMoveCorrect(int X, int Y){
-        if(fields[X][Y].getState().equals(IntersectionState.EMPTY)){
+        if(fields[X][Y].getState().equals(IntersectionState.EMPTY) && !isKoViolation()){
             return true;
         } else
             // Jeśli przecięcie jest już zajęte, wyświetl komunikat "Miejsce zajęte" jako dialog
             JOptionPane.showMessageDialog(null, "Miejsce zajęte. Wybierz inne.", "Błąd ruchu", JOptionPane.ERROR_MESSAGE);
+        return false;
+    }
+
+    public boolean isMoveValidForFirstPlayer(int X, int Y) {
+        if (getTurn() == GameThread.first && checkIfMoveCorrect(X, Y)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isMoveValidForSecondPlayer(int X, int Y) {
+        if (getTurn() == GameThread.second && checkIfMoveCorrect(X, Y)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    public boolean isKoViolation() {
+        // Utwórz reprezentację tekstową bieżącego stanu planszy
+        StringBuilder boardStateBuilder = new StringBuilder();
+        for (int i = 0; i < 19; i++) {
+            for (int j = 0; j < 19; j++) {
+                boardStateBuilder.append(fields[i][j].getState().toString());
+            }
+        }
+        String currentBoardState = boardStateBuilder.toString();
+
+        // Sprawdź, czy bieżący stan planszy wystąpił już wcześniej
+        if (previousBoardStates.contains(currentBoardState)) {
+            // Jeśli tak, to mamy naruszenie zasady ko
+            JOptionPane.showMessageDialog(null, "Naruszenie zasady ko. Spróbuj ponownie.", "Błąd ruchu", JOptionPane.ERROR_MESSAGE);
+            return true;
+        }
+
+        // Dodaj bieżący stan planszy do zbioru poprzednich stanów
+        previousBoardStates.add(currentBoardState);
         return false;
     }
 
@@ -47,7 +103,7 @@ public class Board {
      * @param y Współrzędna Y umieszczonego kamienia.
      * @param color Kolor kamienia umieszczonego na planszy.
      */
-    private void captureStones(int x, int y, StoneColor color) {
+    public void captureStones(int x, int y, StoneColor color) {
         // Sprawdź czy współrzędne są poprawne i czy na danym przecięciu znajduje się kamień przeciwnika
         if (!isValidCoordinate(x, y) || fields[x][y].getState() != IntersectionState.OCCUPIED ||
                 fields[x][y].getColor() == color) {
