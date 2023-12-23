@@ -37,7 +37,7 @@ public class Board {
         if(fields[X][Y].getState().equals(IntersectionState.EMPTY) && !isKoViolation()){
             return true;
         } else
-            // Jeśli przecięcie jest już zajęte, wyświetl komunikat "Miejsce zajęte" jako dialog
+            // Jeśli przecięcie jest już zajęte
             JOptionPane.showMessageDialog(null, "Miejsce zajęte. Wybierz inne.", "Błąd ruchu", JOptionPane.ERROR_MESSAGE);
         return false;
     }
@@ -58,6 +58,7 @@ public class Board {
         }
     }
 
+    //jeśli kamień został uduszony w ko, nie może udusić kamienia przeciwnika w następnym ruchu
     public boolean isKoViolation() {
         // Utwórz reprezentację tekstową bieżącego stanu planszy
         StringBuilder boardStateBuilder = new StringBuilder();
