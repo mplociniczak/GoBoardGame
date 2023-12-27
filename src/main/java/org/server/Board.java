@@ -73,61 +73,47 @@ public class Board {
     }
 
 
-    /**
-     * Metoda do przechwytywania kamieni przeciwnika.
-     * @param x Współrzędna X umieszczonego kamienia.
-     * @param y Współrzędna Y umieszczonego kamienia.
-     * @param color Kolor kamienia umieszczonego na planszy.
-     */
-    public void captureStones(int x, int y, StoneColor color) {
-        // Sprawdź czy współrzędne są poprawne i czy na danym przecięciu znajduje się kamień przeciwnika
-        if (fields[x][y].getState() == IntersectionState.EMPTY ||
-                fields[x][y].getColor() == color) {
-            return;  // Wychodzi, jeśli współrzędne są niepoprawne lub kamień jest tego samego koloru
-        }
-
-        captureAdjacentStones(x, y, new HashSet<>());
+    public void captureStones(int X, int Y, StoneColor opponentColor) {
+        // Sprawdź wszystkie sąsiednie kamienie przeciwnika
+        captureStonesInDirection(X, Y - 1, opponentColor); // kamień po lewej
+        captureStonesInDirection(X, Y + 1, opponentColor); // kamień po prawej
+        captureStonesInDirection(X - 1, Y, opponentColor); // kamień powyżej
+        captureStonesInDirection(X + 1, Y, opponentColor); // kamień poniżej
     }
 
-    /**
-     * Metoda pomocnicza do rekurencyjnego przechwytywania kamieni przeciwnika.
-     * @param x Współrzędna X przecięcia, które sprawdzamy.
-     * @param y Współrzędna Y przecięcia, które sprawdzamy.
-     * @param visited Zbiór odwiedzonych przecięć, aby uniknąć cyklu.
-     */
-    private void captureAdjacentStones(int x, int y, Set<Point> visited) {
-        // Sprawdź czy współrzędne są poprawne i czy przecięcie nie zostało już odwiedzone
-        if (!isValidCoordinate(x, y) || !visited.add(new Point(x, y))) {
-            return;  // Wychodzi, jeśli współrzędne są niepoprawne lub już odwiedzone
+    private void captureStonesInDirection(int x, int y, StoneColor opponentColor) {
+        if (isValidPosition(x, y) && fields[x][y].getColor() == opponentColor) {
+            Set<Point> capturedStones = new HashSet<>();
+            if (!hasLiberty(x, y, capturedStones)) {
+                // Udusz kamienie przeciwnika
+                for (Point point : capturedStones) {
+                    fields[point.x][point.y].removeStone();
+                }
+            }
+        }
+    }
+
+    private boolean hasLiberty(int x, int y, Set<Point> visited) {
+        if (!isValidPosition(x, y) || visited.contains(new Point(x, y))) {
+            return false;
         }
 
-        // Wychodzi, jeśli przecięcie jest puste
+        visited.add(new Point(x, y));
+
         if (fields[x][y].getState() == IntersectionState.EMPTY) {
-            return;
+            return true;
         }
 
-        // Sprawdź, czy kamień stracił oddech
-        if (!hasBreath(x, y)) {
-            // Złap kamienie przeciwnika
-            fields[x][y].removeStone();
-
-            // Wywołaj rekurencyjnie dla sąsiadów
-            captureAdjacentStones(x + 1, y, visited);
-            captureAdjacentStones(x - 1, y, visited);
-            captureAdjacentStones(x, y + 1, visited);
-            captureAdjacentStones(x, y - 1, visited);
-        }
+        return hasLiberty(x - 1, y, visited) ||
+                hasLiberty(x + 1, y, visited) ||
+                hasLiberty(x, y - 1, visited) ||
+                hasLiberty(x, y + 1, visited);
     }
 
-    /**
-     * Metoda sprawdzająca, czy współrzędne są w zakresie planszy.
-     * @param x Współrzędna X.
-     * @param y Współrzędna Y.
-     * @return true, jeśli współrzędne są w zakresie planszy, w przeciwnym razie false.
-     */
-    private boolean isValidCoordinate(int x, int y) {
+    private boolean isValidPosition(int x, int y) {
         return x >= 0 && x < 19 && y >= 0 && y < 19;
     }
+
 
     /**
      * Metoda sprawdzająca, czy kamień ma oddech.

@@ -96,7 +96,7 @@ public class GameThread implements Runnable {
 
                 }
 
-                //board.printBoardToHelpDebugging();
+                board.printBoardToHelpDebugging();
 
             }
 
