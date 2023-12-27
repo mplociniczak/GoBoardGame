@@ -1,16 +1,11 @@
 package org.server;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.server.GameThread.first;
-import static org.server.GameThread.second;
-
 public class Board {
-    private int turn;  // zmienna turn do przechowywania aktualnej tury
-    public Stone[][] fields;
+    public static Stone[][] fields;
     private Set<String> previousBoardStates;
     public Board(){
         fields = new Stone[19][19];
@@ -20,81 +15,61 @@ public class Board {
             }
         }
         previousBoardStates = new HashSet<>();
-        turn = 1;  // Ustaw startową turę
     }
 
-    // metoda do uzyskiwania aktualnej tury
-    public int getTurn() {
-        return turn;
-    }
-
-    // metoda do ustawiania nowej tury
-    public void setTurn(int newTurn) {
-        this.turn = newTurn;
+    public void printBoardToHelpDebugging() {
+        for (int i = 0; i < 19; i++) {
+            for (int j = 0; j < 19; j++) {
+                if(fields[i][j].getState().equals(IntersectionState.OCCUPIED))
+                System.out.println("row " + i + " " + "col " + j + " " + fields[i][j].getColor());
+            }
+        }
     }
 
     public boolean checkIfMoveCorrect(int X, int Y){
-        if(fields[X][Y].getState().equals(IntersectionState.EMPTY) && !isKoViolation()){
-            return true;
-        } else
-            // Jeśli przecięcie jest już zajęte
-            JOptionPane.showMessageDialog(null, "Miejsce zajęte. Wybierz inne.", "Błąd ruchu", JOptionPane.ERROR_MESSAGE);
-        return false;
-    }
-
-    public boolean isMoveValidForFirstPlayer(int X, int Y) {
-        if (getTurn() == GameThread.first && checkIfMoveCorrect(X, Y)) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    public boolean isMoveValidForSecondPlayer(int X, int Y) {
-        if (getTurn() == GameThread.second && checkIfMoveCorrect(X, Y)) {
-            return true;
-        } else {
-            return false;
-        }
+        return fields[X][Y].getState().equals(IntersectionState.EMPTY) && !isKoViolation();
     }
 
     //jeśli kamień został uduszony w ko, nie może udusić kamienia przeciwnika w następnym ruchu
     public boolean isKoViolation() {
-        // Utwórz reprezentację tekstową bieżącego stanu planszy
         StringBuilder boardStateBuilder = new StringBuilder();
         for (int i = 0; i < 19; i++) {
             for (int j = 0; j < 19; j++) {
                 boardStateBuilder.append(fields[i][j].getState().toString());
             }
         }
-        String currentBoardState = boardStateBuilder.toString();
+        return !previousBoardStates.add(boardStateBuilder.toString());
+    }
 
-        // Sprawdź, czy bieżący stan planszy wystąpił już wcześniej
-        if (previousBoardStates.contains(currentBoardState)) {
-            // Jeśli tak, to mamy naruszenie zasady ko
-            JOptionPane.showMessageDialog(null, "Naruszenie zasady ko. Spróbuj ponownie.", "Błąd ruchu", JOptionPane.ERROR_MESSAGE);
-            return true;
+    public StringBuilder BoardToStringBuilderWithStoneColors(int X, int Y) {
+        StringBuilder boardStateBuilder = new StringBuilder();
+
+        boardStateBuilder.append(X);
+        boardStateBuilder.append(" ");
+        boardStateBuilder.append(Y);
+        boardStateBuilder.append(" ");
+
+        for (int i = 0; i < 19; i++) {
+            for (int j = 0; j < 19; j++) {
+                boardStateBuilder.append(fields[i][j].getColor().toString());
+                boardStateBuilder.append(" ");
+            }
         }
-
-        // Dodaj bieżący stan planszy do zbioru poprzednich stanów
-        previousBoardStates.add(currentBoardState);
-        return false;
+        return boardStateBuilder;
     }
 
     public void placeBlackStone(int X, int Y) {
-        StoneColor currentColor = StoneColor.BLACK;
-        fields[X][Y].placeStone(currentColor);
 
+        fields[X][Y].placeStone(StoneColor.BLACK);
         // Sprawdź, czy są złapane kamienie przeciwnika
-        captureStones(X, Y, currentColor);
+        captureStones(X, Y, StoneColor.WHITE);
     }
 
     public void placeWhiteStone(int X, int Y) {
-        StoneColor currentColor = StoneColor.WHITE;
-        fields[X][Y].placeStone(currentColor);
 
+        fields[X][Y].placeStone(StoneColor.WHITE);
         // Sprawdź, czy są złapane kamienie przeciwnika
-        captureStones(X, Y, currentColor);
+        captureStones(X, Y, StoneColor.BLACK);
     }
 
 
@@ -106,13 +81,12 @@ public class Board {
      */
     public void captureStones(int x, int y, StoneColor color) {
         // Sprawdź czy współrzędne są poprawne i czy na danym przecięciu znajduje się kamień przeciwnika
-        if (!isValidCoordinate(x, y) || fields[x][y].getState() != IntersectionState.OCCUPIED ||
+        if (fields[x][y].getState() == IntersectionState.EMPTY ||
                 fields[x][y].getColor() == color) {
             return;  // Wychodzi, jeśli współrzędne są niepoprawne lub kamień jest tego samego koloru
         }
 
-        Set<Point> visited = new HashSet<>();  // Zbior, aby śledzić już odwiedzone przecięcia
-        captureAdjacentStones(x, y, visited);
+        captureAdjacentStones(x, y, new HashSet<>());
     }
 
     /**
@@ -127,15 +101,8 @@ public class Board {
             return;  // Wychodzi, jeśli współrzędne są niepoprawne lub już odwiedzone
         }
 
-        StoneColor stoneColor = fields[x][y].getColor();
-
         // Wychodzi, jeśli przecięcie jest puste
-        if (stoneColor == StoneColor.EMPTY) {
-            return;
-        }
-
-        // Wychodzi, jeśli kamień jest tego samego koloru
-        if (stoneColor == StoneColor.BLACK || stoneColor == StoneColor.WHITE) {
+        if (fields[x][y].getState() == IntersectionState.EMPTY) {
             return;
         }
 
@@ -171,7 +138,7 @@ public class Board {
      */
     private boolean hasBreath(int x, int y, Set<Point> visited) {
         // Sprawdź, czy współrzędne są w zakresie planszy i czy przecięcie nie zostało już odwiedzone
-        if (!isValidCoordinate(x, y) || visited.contains(new Point(x, y))) {
+        if (visited.contains(new Point(x, y))) {
             return false;
         }
 

@@ -7,7 +7,7 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class Server {
-    private static final int port = 6660;
+    public static final int port = 6660;
     public static ArrayList<GameThread> allCurrentGames = new ArrayList<>();
     public static void addGame(GameThread currentGame) { allCurrentGames.add(currentGame); }
     public static void removeGame(GameThread finishedGame) { allCurrentGames.remove(finishedGame); }
@@ -35,7 +35,7 @@ public class Server {
                 System.out.println("Second client connected");
 
                 GameThread currentGame = new GameThread(firstClientSocket, secondClientSocket);
-                //GameThread currentGame = new GameThread(firstClientSocket);
+
                 new Thread(currentGame).start();
 
             } catch (IOException e) {

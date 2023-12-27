@@ -16,23 +16,12 @@ public class GameThread implements Runnable {
         this.secondClientSocket = secondClientSocket;
         board = new Board();
     }
-//public GameThread(Socket firstClientSocket) {
-//    this.firstClientSocket = firstClientSocket;
-//    //this.secondClientSocket = secondClientSocket;
-//}
-    private void sendMove(DataOutputStream out, int X, int Y) throws IOException {
-        out.writeInt(X);
-        out.writeInt(Y);
-    }
 
-    public static int getTurn() {
-        return turn;
+    private void sendMove(ObjectOutputStream out, int X, int Y) throws IOException {
+        System.out.println(board.BoardToStringBuilderWithStoneColors(X, Y));
+        out.writeObject(board.BoardToStringBuilderWithStoneColors(X, Y));
+        out.flush();
     }
-
-    public static void setTurn(int newTurn) {
-        turn = newTurn;
-    }
-
     @Override
     public void run() {
 
@@ -43,49 +32,72 @@ public class GameThread implements Runnable {
         System.out.println("Running...");
 
         try{
-            DataInputStream firstClientInput = new DataInputStream(firstClientSocket.getInputStream());
-            DataOutputStream firstClientOutput = new DataOutputStream(firstClientSocket.getOutputStream());
+            ObjectOutputStream firstClientOutput = new ObjectOutputStream(firstClientSocket.getOutputStream());
+            ObjectInputStream firstClientInput = new ObjectInputStream(firstClientSocket.getInputStream());
 
-            DataInputStream secondClientInput = new DataInputStream(secondClientSocket.getInputStream());
-            DataOutputStream secondClientOutput = new DataOutputStream(secondClientSocket.getOutputStream());
+            ObjectOutputStream secondClientOutput = new ObjectOutputStream(secondClientSocket.getOutputStream());
+            ObjectInputStream secondClientInput = new ObjectInputStream(secondClientSocket.getInputStream());
+
+//            DataInputStream firstClientInput = new DataInputStream(firstClientSocket.getInputStream());
+//            DataOutputStream firstClientOutput = new DataOutputStream(firstClientSocket.getOutputStream());
+//
+//            DataInputStream secondClientInput = new DataInputStream(secondClientSocket.getInputStream());
+//            DataOutputStream secondClientOutput = new DataOutputStream(secondClientSocket.getOutputStream());
 
             firstClientOutput.writeInt(first);
+            firstClientOutput.flush();
+
             secondClientOutput.writeInt(second);
+            secondClientOutput.flush();
 
             while (true) {
                 if (turn == first) {
                     X = firstClientInput.readInt();
                     Y = firstClientInput.readInt();
 
-                    if (board.isMoveValidForFirstPlayer(X, Y)) {
+                    System.out.println("First turn: " + X + " " + Y);
+
+                    if (board.checkIfMoveCorrect(X, Y)) {
+
                         board.placeWhiteStone(X, Y);
 
                         sendMove(secondClientOutput, X, Y);
                         sendMove(firstClientOutput, X, Y);
-                        System.out.println("First turn: " + X + " " + Y);
 
-                        turn = second;
                     } else {
                         sendMove(firstClientOutput, -1, -1);
+                        sendMove(secondClientOutput, -1, -1);
                     }
+
+                    turn = second;
+
                 }
 
                 if (turn == second) {
                     X = secondClientInput.readInt();
                     Y = secondClientInput.readInt();
 
-                    if (board.isMoveValidForSecondPlayer(X, Y)) {
+                    System.out.println("Second turn: " + X + " " + Y);
+
+                    if (board.checkIfMoveCorrect(X, Y)) {
+
                         board.placeBlackStone(X, Y);
 
                         sendMove(firstClientOutput, X, Y);
                         sendMove(secondClientOutput, X, Y);
-                        System.out.println("Second turn: " + X + " " + Y);
 
-                        turn = first;
+
                     } else {
                         sendMove(secondClientOutput, -1, -1);
+                        sendMove(firstClientOutput, -1, -1);
                     }
+
+                    turn = first;
+
                 }
+
+                //board.printBoardToHelpDebugging();
+
             }
 
         } catch (IOException ex) {

@@ -5,7 +5,7 @@ public class Stone {
     private IntersectionState intersectionState;
 
     public Stone() {
-        this.color = null;
+        this.color = StoneColor.N;
         this.intersectionState = IntersectionState.EMPTY;
     }
 
@@ -21,6 +21,7 @@ public class Stone {
     public StoneColor getColor() {
         return color;
     }
+    public void setColor(String color) { this.color = StoneColor.valueOf(color); }
 
     public IntersectionState getState() {
         return intersectionState;

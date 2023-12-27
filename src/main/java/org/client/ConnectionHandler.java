@@ -6,16 +6,16 @@ import java.net.Socket;
 
 public class ConnectionHandler {
     private Socket socket = null;
-    private DataInputStream input;
-    private DataOutputStream output;
+    private ObjectInputStream input;
+    private ObjectOutputStream output;
 
     public ConnectionHandler(String address, int port) {
         try {
-            System.out.println("Connecting to server: " + address + ":" + port);
+            System.out.println("Connecting to server: " + address + ", " + port);
             socket = new Socket(address, port);
 
-            input = new DataInputStream(socket.getInputStream());
-            output = new DataOutputStream(socket.getOutputStream());
+            input = new ObjectInputStream(socket.getInputStream());
+            output = new ObjectOutputStream(socket.getOutputStream());
 
             System.out.println("Connection successful!");
 
@@ -29,26 +29,25 @@ public class ConnectionHandler {
         try{
             output.writeInt(X);
             output.writeInt(Y);
+            output.flush();
         } catch (IOException ex) {
             //TODO: handle
         }
     }
 
-    public Point receiveCoordinates() {
+    public StringBuilder receiveCoordinates() {
         try{
-            int X = input.readInt();
-            int Y = input.readInt();
-            System.out.println("Coordinates: " + X + " " + Y);
-            return new Point(X, Y);
-        } catch (IOException ex) {
-            // Handle the exception properly
+            StringBuilder board = (StringBuilder) input.readObject();//BLACK, BLACK, WHITE, NULL itp
+            return board;
+        } catch (IOException | ClassNotFoundException ex) {
             ex.printStackTrace();
-            return null;
         }
+        return null;
     }
+
     public int receiveTurn() {
         try{
-            int turn =  input.readInt();
+            int turn = input.readInt();
             System.out.println(turn);
             return turn;
         } catch (IOException ex) {

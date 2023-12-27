@@ -1,5 +1,7 @@
 package org.client;
 
+import org.server.Server;
+import org.server.Stone;
 import org.server.StoneColor;
 import org.server.StoneComponent;
 
@@ -7,6 +9,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.ArrayList;
 
 /**
  * Actual version of a client - communicates with server
@@ -26,8 +29,8 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private final static int secondPlayer = 2;
     private final static int boardSize = 19;
     private ConnectionHandler connection;
-    private JPanel[][]board = null;
     private boolean myTurn;
+    private static Stone[][] fields;
 
     public ClientWithBoard() {
 
@@ -35,7 +38,14 @@ public class ClientWithBoard extends JFrame implements Runnable {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(900, 550);
 
-        connection = new ConnectionHandler("localhost", 6660);
+        connection = new ConnectionHandler("localhost", Server.port);
+
+        fields = new Stone[19][19];
+        for (int i = 0; i < 19; i++) {
+            for (int j = 0; j < 19; j++) {
+                fields[i][j] = new Stone();
+            }
+        }
 
         createUI();
         setVisible(true);
@@ -135,12 +145,9 @@ public class ClientWithBoard extends JFrame implements Runnable {
         int tileSizeX = gameBoardPanel.getWidth() / boardSize;
         int tileSizeY = gameBoardPanel.getHeight() / boardSize;
 
-        int X = x / tileSizeX;
-        int Y = y / tileSizeY;
-
         // Ensure that the indices are within the valid range
-        X = Math.max(0, Math.min(X, boardSize - 1));
-        Y = Math.max(0, Math.min(Y, boardSize - 1));
+        int X = Math.max(0, Math.min(x / tileSizeX, boardSize - 1));
+        int Y = Math.max(0, Math.min(y / tileSizeY, boardSize - 1));
 
         return new Point(X, Y);
     }
@@ -148,7 +155,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private void updateStoneGraphics(int X, int Y, StoneColor color) {
         // Pobierz centralny kwadrat, który znajduje się na przecięciu czterech sąsiadujących kwadratów
         JPanel centralSquare = (JPanel) gameBoardPanel.getComponent(Y * boardSize + X);
-        //JPanel squareToPaintRockOn = board[X][Y];
+
         // Usunięcie wcześniejszych komponentów z centralnego kwadratu
         centralSquare.removeAll();
         //squareToPaintRockOn.removeAll();
@@ -176,15 +183,39 @@ public class ClientWithBoard extends JFrame implements Runnable {
         centralSquare.repaint();
     }
 
+    private void updateStoneGraphics(String[] board, StoneColor color) {}
+
     private void receiveCoordinatesAndPlaceStone(StoneColor color){
-        Point receivedCoordinates = connection.receiveCoordinates();
-        int X = (int) receivedCoordinates.getX();
-        int Y = (int) receivedCoordinates.getY();
-        System.out.println(X + " " + Y);
+        StringBuilder receivedCoordinates = connection.receiveCoordinates();
+
+        System.out.println(receivedCoordinates);
+
+        String receivedString[] = receivedCoordinates.toString().split(" ");
+
+        int X = Integer.parseInt(receivedString[0]);
+        int Y = Integer.parseInt(receivedString[1]);
+
+        receivedString[1] = null;
+        receivedString[0] = null;
+
+        int ctr = 2;
+        for (int i = 0; i < 19; i++) {
+            for (int j = 0; j < 19; j++) {
+                fields[i][j].setColor(receivedString[ctr++]);
+                System.out.print(fields[i][j].getColor() + " ");
+            }
+        }
+        System.out.print("\n");
+
+//        Point receivedCoordinates = connection.receiveCoordinates();
+//
+//        int X = receivedCoordinates.x;
+//        int Y = receivedCoordinates.y;
 
         //Incorrect move
         if(X == -1 && Y == -1) {
             System.out.println("Incorrect move!");
+            JOptionPane.showMessageDialog(null, "Miejsce zajęte. Wybierz inne.", "Błąd ruchu", JOptionPane.ERROR_MESSAGE);
         } else {
             updateStoneGraphics(X, Y, color);
         }
@@ -196,9 +227,6 @@ public class ClientWithBoard extends JFrame implements Runnable {
         myTurn = (player == 1);
 
         System.out.println(player);
-
-        int X = 0;
-        int Y = 0;
 
         while (true) {
             if (player == firstPlayer) {
@@ -226,10 +254,14 @@ public class ClientWithBoard extends JFrame implements Runnable {
         @Override
         public void mouseClicked(MouseEvent e) {
             if(myTurn){
+
                 Point boardIndices = convertCoordinatesToBoardIndex(e.getX(), e.getY());
+
                 int X = (int) boardIndices.getX();
                 int Y = (int) boardIndices.getY();
+
                 connection.sendCoordinates(X, Y);
+
                 myTurn = false;
             }
         }
