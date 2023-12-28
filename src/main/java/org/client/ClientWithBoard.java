@@ -1,9 +1,6 @@
 package org.client;
 
-import org.server.Server;
-import org.server.Stone;
-import org.server.StoneColor;
-import org.server.StoneComponent;
+import org.server.*;
 
 import javax.swing.*;
 import java.awt.*;
@@ -182,20 +179,31 @@ public class ClientWithBoard extends JFrame implements Runnable {
         centralSquare.repaint();
     }
 
-    private void updateBoardGraphics(Stone[][] board, StoneColor color) {
+    //moja próba 1
+    private void updateWholeBoardGraphics() {
+        for (int y = 0; y < boardSize; y++) {
+            for (int x = 0; x < boardSize; x++) {
+                StoneColor color;
+                String colorString = fields[y][x].getColor().toString();
 
-        for (int i = 0; i < board.length; i++) {
-            for (int j = 0; j < board[i].length; j++) {
-                // Pobierz centralny kwadrat, który znajduje się na przecięciu czterech sąsiadujących kwadratów
-                JPanel centralSquare = (JPanel) gameBoardPanel.getComponent(i * boardSize + j);
+                if (colorString.equals("WHITE")) {
+                    color = StoneColor.WHITE;
+                } else if (colorString.equals("BLACK")) {
+                    color = StoneColor.BLACK;
+                } else {
+                    continue;
+                }
+
+                // Pobierz centralny kwadrat dla każdego pola na planszy
+                JPanel centralSquare = (JPanel) gameBoardPanel.getComponent(y * boardSize + x);
 
                 // Usunięcie wcześniejszych komponentów z centralnego kwadratu
                 centralSquare.removeAll();
 
                 // Oblicz położenie do narysowania koła na środku przecięcia
                 int tileSize = gameBoardPanel.getWidth() / boardSize;
-                int centerX = j * tileSize + tileSize / 2;
-                int centerY = i * tileSize + tileSize / 2;
+                int centerX = x * tileSize + tileSize / 2;
+                int centerY = y * tileSize + tileSize / 2;
 
                 // Dodanie nowego komponentu reprezentującego kamień jako okrąg na środku przecięcia
                 StoneComponent stoneComponent = new StoneComponent(color);
@@ -216,6 +224,31 @@ public class ClientWithBoard extends JFrame implements Runnable {
             }
         }
     }
+
+
+    //moja próba 2
+    private void updateBoardGraphics(StringBuilder boardState) {
+        String[] boardValues = boardState.toString().split(" ");
+        int index = 2;  // Zaczynamy od trzeciego elementu, pomijając X i Y
+
+        for (int y = 0; y < boardSize; y++) {
+            for (int x = 0; x < boardSize; x++) {
+                StoneColor color;
+                String colorString = boardValues[index++];
+
+                if (colorString.equals("WHITE")) {
+                    color = StoneColor.WHITE;
+                } else if (colorString.equals("BLACK")) {
+                    color = StoneColor.BLACK;
+                } else {
+                    continue;
+                }
+
+                updateStoneGraphics(x, y, color);
+            }
+        }
+    }
+
 
 
     private void receiveCoordinatesAndPlaceStone(StoneColor color){
@@ -245,8 +278,8 @@ public class ClientWithBoard extends JFrame implements Runnable {
             System.out.println("Incorrect move!");
             JOptionPane.showMessageDialog(null, "Miejsce zajęte. Wybierz inne.", "Błąd ruchu", JOptionPane.ERROR_MESSAGE);
         } else {
-            updateStoneGraphics(X, Y, color);
-            //updateBoardGraphics(fields, color);
+            //updateStoneGraphics(X, Y, color);
+            updateWholeBoardGraphics();
         }
     }
     @Override
