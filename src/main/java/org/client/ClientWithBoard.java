@@ -207,11 +207,6 @@ public class ClientWithBoard extends JFrame implements Runnable {
         }
         System.out.print("\n");
 
-//        Point receivedCoordinates = connection.receiveCoordinates();
-//
-//        int X = receivedCoordinates.x;
-//        int Y = receivedCoordinates.y;
-
         //Incorrect move
         if(X == -1 && Y == -1) {
             System.out.println("Incorrect move!");

@@ -26,7 +26,7 @@ public class TestClientServerConnection {
         }
 
         // wątek pierwszego klienta
-        Thread clientThread = new Thread(() -> {
+        Thread firstClientThread = new Thread(() -> {
             // tworzenie pierwszego klienta
             ConnectionHandler clientConnection = new ConnectionHandler("localhost", 6670);
 
@@ -34,14 +34,14 @@ public class TestClientServerConnection {
             clientConnection.sendCoordinates(1, 8);
 
             // test odebranie współrzednych
-            Point receivedCoordinates = clientConnection.receiveCoordinates();
+            StringBuilder receivedCoordinates = clientConnection.receiveCoordinates();
             assertNotNull(receivedCoordinates);
 
             // test czy tury są przechwytywane
             int turn = clientConnection.receiveTurn();
             assertTrue(turn == 1 || turn == 2);
         });
-        clientThread.start();
+        firstClientThread.start();
 
         // czas dla testów na kliencie
         try {
@@ -52,7 +52,7 @@ public class TestClientServerConnection {
 
         // zatrzymanie
         serverThread.interrupt();
-        clientThread.interrupt();
+        firstClientThread.interrupt();
     }
 }
 

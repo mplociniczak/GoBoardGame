@@ -18,21 +18,21 @@ public class Stone {
         }
     }
 
-    public StoneColor getColor() {
-        return color;
-    }
-    public void setColor(String color) { this.color = StoneColor.valueOf(color); }
-
-    public IntersectionState getState() {
-        return intersectionState;
-    }
-
     public void removeStone() {
         if (intersectionState == IntersectionState.OCCUPIED) {
-            this.color = null;
+            this.color = StoneColor.N;
             this.intersectionState = IntersectionState.EMPTY;
         } else {
             throw new IllegalStateException("No stone to remove at this intersection.");
         }
     }
+
+    public StoneColor getColor() {
+        return color;
+    }
+    public void setColor(String color) { this.color = StoneColor.valueOf(color); }
+    public IntersectionState getState() {
+        return intersectionState;
+    }
+    public void setIntersectionState(IntersectionState state) { this.intersectionState = state; }
 }
