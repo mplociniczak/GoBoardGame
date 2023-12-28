@@ -7,7 +7,7 @@ import java.util.Set;
 
 public class Board {
     public static Stone[][] fields;
-    private Set<String> previousBoardStates;
+    Set<String> previousBoardStates;
     public Board(){
         fields = new Stone[19][19];
         for (int i = 0; i < 19; i++) {
