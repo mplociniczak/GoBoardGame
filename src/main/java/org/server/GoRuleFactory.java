@@ -1,6 +1,6 @@
 package org.server;
 
-// Interfejs fabryki abstrakcyjnej dla zasad gry Go
+// Interfejs fabryki dla zasad gry Go
 public interface GoRuleFactory {
-    GoRule createRule();
+    boolean check(Board board, int X, int Y);
 }

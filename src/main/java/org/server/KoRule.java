@@ -1,6 +1,5 @@
 package org.server;
-
-public class KoRule implements GoRule {
+public class KoRule implements GoRuleFactory {
     @Override
     public boolean check(Board board, int X, int Y) {
         StringBuilder boardStateBuilder = new StringBuilder();
@@ -26,3 +25,4 @@ public class KoRule implements GoRule {
         return true;
     }
 }
+

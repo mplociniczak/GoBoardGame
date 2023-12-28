@@ -1,13 +1,14 @@
 package org.server;
 
-import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.List;
 
 public class Board {
     public static Stone[][] fields;
     Set<String> previousBoardStates;
+    private List<GoRuleFactory> goRules;
     public Board(){
         fields = new Stone[19][19];
         for (int i = 0; i < 19; i++) {
@@ -16,6 +17,10 @@ public class Board {
             }
         }
         previousBoardStates = new HashSet<>();
+        goRules = new ArrayList<>();
+        // Dodaj reguły do listy
+        goRules.add(new KoRule());
+        goRules.add(new SurroundingRule());
     }
 
     public void printBoardToHelpDebugging() {
@@ -28,9 +33,22 @@ public class Board {
     }
 
     public boolean checkIfMoveCorrect(int X, int Y){
-        return fields[X][Y].getState().equals(IntersectionState.EMPTY) && !isKoViolation();
+        return fields[X][Y].getState().equals(IntersectionState.EMPTY);
     }
 
+    public boolean checkAllRules(int X, int Y) {
+        // Sprawdź wszystkie zasady dla danego ruchu
+        for (GoRuleFactory rule : goRules) {
+            if (!rule.check(this, X, Y)) {
+                // Jeśli któraś zasada nie została spełniona, zwróć false
+                return false;
+            }
+        }
+        // Jeśli wszystkie zasady zostały spełnione, zwróć true
+        return true;
+    }
+
+    /*
     //jeśli kamień został uduszony w ko, nie może udusić kamienia przeciwnika w następnym ruchu
     public boolean isKoViolation() {
         StringBuilder boardStateBuilder = new StringBuilder();
@@ -41,6 +59,8 @@ public class Board {
         }
         return !previousBoardStates.add(boardStateBuilder.toString());
     }
+
+     */
 
     public StringBuilder BoardToStringBuilderWithStoneColors(int X, int Y) {
         StringBuilder boardStateBuilder = new StringBuilder();
@@ -60,24 +80,31 @@ public class Board {
     }
 
     public void placeBlackStone(int X, int Y) {
+        if (checkIfMoveCorrect(X, Y) && checkAllRules(X, Y)) {
+            fields[X][Y].placeStone(StoneColor.BLACK);
 
-        fields[X][Y].placeStone(StoneColor.BLACK);
-        // Sprawdź, czy są złapane kamienie przeciwnika
-        searchForAdjacentEnemyStones(X, Y, StoneColor.WHITE, StoneColor.BLACK);
+        } else {
+            // Obsłuż błąd, narazie tak
+            System.out.println("Ruch niepoprawny zgodnie z zasadami Go.");
+        }
     }
 
     public void placeWhiteStone(int X, int Y) {
+        if (checkIfMoveCorrect(X, Y) && checkAllRules(X, Y)) {
+            fields[X][Y].placeStone(StoneColor.WHITE);
 
-        fields[X][Y].placeStone(StoneColor.WHITE);
-        // Sprawdź, czy są złapane kamienie przeciwnika
-        searchForAdjacentEnemyStones(X, Y, StoneColor.BLACK, StoneColor.WHITE);
+        } else {
+            // Obsłuż błąd, narazie tak
+            System.out.println("Ruch niepoprawny zgodnie z zasadami Go.");
+        }
     }
 
-    private boolean isValidCoordinate(int x, int y) {
+
+
+    /*
+    boolean isValidCoordinate(int x, int y) {
         return x >= 0 && x < 19 && y >= 0 && y < 19;
-    }
-
-    private void searchForAdjacentEnemyStones(int X, int Y, StoneColor enemyColor, StoneColor allyColor) {
+    }private void searchForAdjacentEnemyStones(int X, int Y, StoneColor enemyColor, StoneColor allyColor) {
         Set<Point> visited = new HashSet<>();
 
         stoneRemover(X+1, Y, enemyColor, allyColor, visited);
@@ -95,6 +122,7 @@ public class Board {
      * @param allyColor ally stones
      * @param visited list of all checked stones to avoid repetitions
      */
+    /*
     private void stoneRemover(int X, int Y, StoneColor enemyColor, StoneColor allyColor, Set<Point> visited) {
         Set<Point> surroundedStones = new HashSet<>();
 
@@ -117,6 +145,7 @@ public class Board {
      * @param visited set of all visited stones to avoid infinite recursion
      * @return true if stone is surrounded, false if not
      */
+    /*
     private boolean checkIfSurrounded(int X, int Y, StoneColor enemyColor, Set<Point> surroundedStones, Set<Point> visited) {
         boolean isSurrounded;
 
@@ -161,5 +190,7 @@ public class Board {
         return true;
 
     }
+
+     */
 }
 
