@@ -9,7 +9,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
 
 /**
  * Actual version of a client - communicates with server
@@ -183,7 +182,41 @@ public class ClientWithBoard extends JFrame implements Runnable {
         centralSquare.repaint();
     }
 
-    private void updateStoneGraphics(String[] board, StoneColor color) {}
+    private void updateBoardGraphics(Stone[][] board, StoneColor color) {
+
+        for (int i = 0; i < board.length; i++) {
+            for (int j = 0; j < board[i].length; j++) {
+                // Pobierz centralny kwadrat, który znajduje się na przecięciu czterech sąsiadujących kwadratów
+                JPanel centralSquare = (JPanel) gameBoardPanel.getComponent(i * boardSize + j);
+
+                // Usunięcie wcześniejszych komponentów z centralnego kwadratu
+                centralSquare.removeAll();
+
+                // Oblicz położenie do narysowania koła na środku przecięcia
+                int tileSize = gameBoardPanel.getWidth() / boardSize;
+                int centerX = j * tileSize + tileSize / 2;
+                int centerY = i * tileSize + tileSize / 2;
+
+                // Dodanie nowego komponentu reprezentującego kamień jako okrąg na środku przecięcia
+                StoneComponent stoneComponent = new StoneComponent(color);
+                int componentSize = stoneComponent.getPreferredSize().width;
+
+                // Ustawienie rozmiaru kamienia
+                stoneComponent.setSize(componentSize, componentSize);
+
+                // Ustawienie pozycji kamienia na środku przecięcia
+                int componentX = centerX - componentSize / 2;
+                int componentY = centerY - componentSize / 2;
+
+                stoneComponent.setBounds(componentX, componentY, componentSize, componentSize);
+                centralSquare.add(stoneComponent);
+
+                centralSquare.revalidate();
+                centralSquare.repaint();
+            }
+        }
+    }
+
 
     private void receiveCoordinatesAndPlaceStone(StoneColor color){
         StringBuilder receivedCoordinates = connection.receiveCoordinates();
@@ -213,6 +246,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
             JOptionPane.showMessageDialog(null, "Miejsce zajęte. Wybierz inne.", "Błąd ruchu", JOptionPane.ERROR_MESSAGE);
         } else {
             updateStoneGraphics(X, Y, color);
+            //updateBoardGraphics(fields, color);
         }
     }
     @Override
