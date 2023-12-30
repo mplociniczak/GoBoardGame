@@ -24,7 +24,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private final static int firstPlayer = 1;
     private final static int secondPlayer = 2;
     private final static int boardSize = 19;
-    private ConnectionHandler connection;
+    private final ConnectionHandler connection;
     private boolean myTurn;
     private static Stone[][] fields;
 
@@ -92,8 +92,6 @@ public class ClientWithBoard extends JFrame implements Runnable {
         }
 
         splitPane.setLeftComponent(gameBoardPanel);
-
-
 
         ter_B = new JLabel();
         ter_W = new JLabel();
@@ -177,55 +175,25 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
         centralSquare.revalidate();
         centralSquare.repaint();
+
+        removeStoneFromBoard();
     }
 
     //metoda do usuwania kamienia na GUI
-    public static void removeStoneFromBoard(int X, int Y) {
-        // Upewnij się, że indeksy mieszczą się w zakresie
-        if (SurroundingRule.isValidCoordinate(X, Y)) {
-            // Pobierz centralny kwadrat na określonej pozycji
-            JPanel centralSquare = (JPanel) gameBoardPanel.getComponent(Y * boardSize + X);
-
-            // Usuń wszystkie komponenty z centralnego kwadratu
-            centralSquare.removeAll();
-
-            // Przerysuj centralny kwadrat
-            centralSquare.revalidate();
-            centralSquare.repaint();
-
-            // Zaktualizuj tablicę Stone, aby odzwierciedlić usunięcie kamienia
-            fields[X][Y].removeStone();
-        }
-    }
-
-    //usuwanie z dostanymi od serwera współrzędnymi
-    private void receiveCoordinatesAndRemoveStone() {
-        StringBuilder receivedCoordinates = connection.receiveCoordinates();
-
-        System.out.println(receivedCoordinates);
-
-        String receivedString[] = receivedCoordinates.toString().split(" ");
-
-        int X = Integer.parseInt(receivedString[0]);
-        int Y = Integer.parseInt(receivedString[1]);
-
-        receivedString[1] = null;
-        receivedString[0] = null;
-
-        int ctr = 2;
-        for (int i = 0; i < 19; i++) {
-            for (int j = 0; j < 19; j++) {
-                fields[i][j].setColor(receivedString[ctr++]);
-                System.out.print(fields[i][j].getColor() + " ");
+    private void removeStoneFromBoard() {
+        for(int i = 0; i < boardSize; i++) {
+            for(int j = 0; j < boardSize; j++) {
+                if(fields[i][j].getColor().equals(StoneColor.REMOVED)) {
+                    JPanel centralSquare = (JPanel) gameBoardPanel.getComponent(j * boardSize + i);
+                    // Usuń wszystkie komponenty z centralnego kwadratu
+                    centralSquare.removeAll();
+                    // Przerysuj centralny kwadrat
+                    centralSquare.revalidate();
+                    centralSquare.repaint();
+                }
             }
         }
-        System.out.print("\n");
-
-        // Remove stone at the specified coordinates
-        removeStoneFromBoard(X, Y);
     }
-
-
 
     private void receiveCoordinatesAndPlaceStone(StoneColor color){
         StringBuilder receivedCoordinates = connection.receiveCoordinates();
@@ -243,7 +211,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
         int ctr = 2;
         for (int i = 0; i < 19; i++) {
             for (int j = 0; j < 19; j++) {
-                fields[i][j].setColor(receivedString[ctr++]);
+                fields[i][j].setColor(StoneColor.valueOf(receivedString[ctr++]));
                 System.out.print(fields[i][j].getColor() + " ");
             }
         }

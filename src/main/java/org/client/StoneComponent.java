@@ -1,4 +1,4 @@
-package org.server;
+package org.client;
 
 import org.server.StoneColor;
 
@@ -12,7 +12,7 @@ public class StoneComponent extends JComponent {
     public StoneComponent(StoneColor color) {
         this.color = color;
 
-        setPreferredSize(new Dimension(12, 12));
+        setPreferredSize(new Dimension(15, 15));
     }
 
     @Override

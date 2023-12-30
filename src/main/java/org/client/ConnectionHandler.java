@@ -56,7 +56,6 @@ public class ConnectionHandler {
         return -1;
     }
 
-
     public void waitForPlayerAction(boolean waiting) throws InterruptedException {
         while (waiting) {
             Thread.sleep(100);

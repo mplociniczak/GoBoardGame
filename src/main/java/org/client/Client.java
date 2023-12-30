@@ -1,7 +1,7 @@
 //package org.client;
 //import org.server.StoneColor;
 //import org.server.Stone;
-//import org.server.StoneComponent;
+//import org.client.StoneComponent;
 //
 //import javax.swing.*;
 //import java.awt.*;

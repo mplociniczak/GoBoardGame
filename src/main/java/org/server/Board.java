@@ -1,14 +1,13 @@
 package org.server;
 
-import java.util.ArrayList;
+import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.List;
 
 public class Board {
-    public static Stone[][] fields;
-    Set<String> previousBoardStates;
-    private List<GoRuleFactory> goRules;
+    private boolean isStoneRemovedFlag = false;
+    private static Stone[][] fields;
+    private Set<String> previousBoardStates;
     public Board(){
         fields = new Stone[19][19];
         for (int i = 0; i < 19; i++) {
@@ -17,38 +16,29 @@ public class Board {
             }
         }
         previousBoardStates = new HashSet<>();
-        goRules = new ArrayList<>();
-        // Dodaj reguły do listy
-        goRules.add(new KoRule());
-        goRules.add(new SurroundingRule());
     }
 
     public void printBoardToHelpDebugging() {
         for (int i = 0; i < 19; i++) {
             for (int j = 0; j < 19; j++) {
                 if(fields[i][j].getState().equals(IntersectionState.OCCUPIED))
-                System.out.println("row " + i + " " + "col " + j + " " + fields[i][j].getColor());
+                    System.out.println("row " + i + " " + "col " + j + " " + fields[i][j].getColor());
             }
         }
     }
 
-    public boolean checkIfMoveCorrect(int X, int Y){
+    public boolean isIntersectionEmpty(int X, int Y){
         return fields[X][Y].getState().equals(IntersectionState.EMPTY);
     }
 
-    public boolean checkAllRules(int X, int Y) {
-        // Sprawdź wszystkie zasady dla danego ruchu
-        for (GoRuleFactory rule : goRules) {
-            if (!rule.check(this, X, Y)) {
-                // Jeśli któraś zasada nie została spełniona, zwróć false
-                return false;
-            }
-        }
-        // Jeśli wszystkie zasady zostały spełnione, zwróć true
-        return true;
+    private boolean isStoneBreathing(int X, int Y) {
+        return fields[X + 1][Y].getState().equals(IntersectionState.EMPTY) ||
+                fields[X - 1][Y].getState().equals(IntersectionState.EMPTY) ||
+                fields[X][Y + 1].getState().equals(IntersectionState.EMPTY) ||
+                fields[X][Y - 1].getState().equals(IntersectionState.EMPTY) ||
+                isStoneRemovedFlag;
     }
 
-    /*
     //jeśli kamień został uduszony w ko, nie może udusić kamienia przeciwnika w następnym ruchu
     public boolean isKoViolation() {
         StringBuilder boardStateBuilder = new StringBuilder();
@@ -60,7 +50,7 @@ public class Board {
         return !previousBoardStates.add(boardStateBuilder.toString());
     }
 
-     */
+
 
     public StringBuilder BoardToStringBuilderWithStoneColors(int X, int Y) {
         StringBuilder boardStateBuilder = new StringBuilder();
@@ -80,32 +70,34 @@ public class Board {
     }
 
     public void placeBlackStone(int X, int Y) {
-        if (checkIfMoveCorrect(X, Y) && checkAllRules(X, Y)) {
-            fields[X][Y].placeStone(StoneColor.BLACK);
+        fields[X][Y].placeStone(StoneColor.BLACK);
 
-        } else {
-            // Obsłuż błąd, narazie tak
-            System.out.println("Ruch niepoprawny zgodnie z zasadami Go.");
+        searchForAdjacentEnemyStones(X, Y, StoneColor.WHITE, StoneColor.BLACK);
+
+        if(!isStoneBreathing(X, Y)) {
+            fields[X][Y].removeStone();
+            X = -1;
+            Y = -1;
         }
     }
 
     public void placeWhiteStone(int X, int Y) {
-        if (checkIfMoveCorrect(X, Y) && checkAllRules(X, Y)) {
-            fields[X][Y].placeStone(StoneColor.WHITE);
+        fields[X][Y].placeStone(StoneColor.WHITE);
 
-        } else {
-            // Obsłuż błąd, narazie tak
-            System.out.println("Ruch niepoprawny zgodnie z zasadami Go.");
+        searchForAdjacentEnemyStones(X, Y, StoneColor.BLACK, StoneColor.WHITE);
+
+        if(!isStoneBreathing(X, Y)) {
+            fields[X][Y].removeStone();
+            X = -1;
+            Y = -1;
         }
     }
 
-
-
-
-    /*
     boolean isValidCoordinate(int x, int y) {
         return x >= 0 && x < 19 && y >= 0 && y < 19;
-    }private void searchForAdjacentEnemyStones(int X, int Y, StoneColor enemyColor, StoneColor allyColor) {
+    }
+
+    private void searchForAdjacentEnemyStones(int X, int Y, StoneColor enemyColor, StoneColor allyColor) {
         Set<Point> visited = new HashSet<>();
 
         stoneRemover(X+1, Y, enemyColor, allyColor, visited);
@@ -115,15 +107,14 @@ public class Board {
 
     }
 
+
     /**
      * Handles removing groups of stones, written to simplify code
      * @param X first stone in a group to be removed
      * @param Y first stone in a group to be removed
      * @param enemyColor enemy stones
      * @param allyColor ally stones
-     * @param visited list of all checked stones to avoid repetitions
-     */
-    /*
+    */
     private void stoneRemover(int X, int Y, StoneColor enemyColor, StoneColor allyColor, Set<Point> visited) {
         Set<Point> surroundedStones = new HashSet<>();
 
@@ -146,7 +137,6 @@ public class Board {
      * @param visited set of all visited stones to avoid infinite recursion
      * @return true if stone is surrounded, false if not
      */
-    /*
     private boolean checkIfSurrounded(int X, int Y, StoneColor enemyColor, Set<Point> surroundedStones, Set<Point> visited) {
         boolean isSurrounded;
 
@@ -191,7 +181,5 @@ public class Board {
         return true;
 
     }
-
-     */
 }
 

@@ -25,8 +25,8 @@ public class GameThread implements Runnable {
     @Override
     public void run() {
 
-        int X = 0;
-        int Y = 0;
+        int X;
+        int Y;
 
         Server.addGame(this);
         System.out.println("Running...");
@@ -37,12 +37,6 @@ public class GameThread implements Runnable {
 
             ObjectOutputStream secondClientOutput = new ObjectOutputStream(secondClientSocket.getOutputStream());
             ObjectInputStream secondClientInput = new ObjectInputStream(secondClientSocket.getInputStream());
-
-//            DataInputStream firstClientInput = new DataInputStream(firstClientSocket.getInputStream());
-//            DataOutputStream firstClientOutput = new DataOutputStream(firstClientSocket.getOutputStream());
-//
-//            DataInputStream secondClientInput = new DataInputStream(secondClientSocket.getInputStream());
-//            DataOutputStream secondClientOutput = new DataOutputStream(secondClientSocket.getOutputStream());
 
             firstClientOutput.writeInt(first);
             firstClientOutput.flush();
@@ -55,9 +49,7 @@ public class GameThread implements Runnable {
                     X = firstClientInput.readInt();
                     Y = firstClientInput.readInt();
 
-                    System.out.println("First turn: " + X + " " + Y);
-
-                    if (board.checkIfMoveCorrect(X, Y)) {
+                    if (board.isIntersectionEmpty(X, Y) && !board.isKoViolation()) {
 
                         board.placeWhiteStone(X, Y);
 
@@ -77,9 +69,7 @@ public class GameThread implements Runnable {
                     X = secondClientInput.readInt();
                     Y = secondClientInput.readInt();
 
-                    System.out.println("Second turn: " + X + " " + Y);
-
-                    if (board.checkIfMoveCorrect(X, Y)) {
+                    if (board.isIntersectionEmpty(X, Y) && !board.isKoViolation()) {
 
                         board.placeBlackStone(X, Y);
 
