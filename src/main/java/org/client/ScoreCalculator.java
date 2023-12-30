@@ -52,7 +52,7 @@ class ScoreCalculator {
 
         for (int i = 0; i < 19; i++) {
             for (int j = 0; j < 19; j++) {
-                if (fields[i][j].getState() == IntersectionState.EMPTY && !visited[i][j]) {
+                if (fields[i][j].getState().equals(IntersectionState.EMPTY) && !visited[i][j]) {
                     // Perform DFS to count territory
                     int emptyTerritorySize = dfs(i, j, visited, color);
                     territoryCount += emptyTerritorySize;
@@ -64,7 +64,7 @@ class ScoreCalculator {
     }
 
     private int dfs(int x, int y, boolean[][] visited, StoneColor color) {
-        if (x < 0 || x >= 19 || y < 0 || y >= 19 || visited[x][y] || fields[x][y].getState() != IntersectionState.EMPTY) {
+        if (x < 0 || x >= 19 || y < 0 || y >= 19 || visited[x][y] || fields[x][y].getState().equals(IntersectionState.OCCUPIED)) {
             return 0;
         }
 
