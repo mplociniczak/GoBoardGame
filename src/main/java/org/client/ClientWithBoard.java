@@ -11,7 +11,7 @@ import java.awt.event.MouseEvent;
  * Actual version of a client - communicates with server
  */
 public class ClientWithBoard extends JFrame implements Runnable {
-    private JPanel gameBoardPanel;
+    private static JPanel gameBoardPanel;
     private JSplitPane splitPane;
     private JPanel scorePanel;
     private JLabel ter_B;  //Territory
@@ -179,74 +179,50 @@ public class ClientWithBoard extends JFrame implements Runnable {
         centralSquare.repaint();
     }
 
-    //moja próba 1
-    private void updateWholeBoardGraphics() {
-        for (int y = 0; y < boardSize; y++) {
-            for (int x = 0; x < boardSize; x++) {
-                StoneColor color;
-                String colorString = fields[y][x].getColor().toString();
+    //metoda do usuwania kamienia na GUI
+    public static void removeStoneFromBoard(int X, int Y) {
+        // Upewnij się, że indeksy mieszczą się w zakresie
+        if (SurroundingRule.isValidCoordinate(X, Y)) {
+            // Pobierz centralny kwadrat na określonej pozycji
+            JPanel centralSquare = (JPanel) gameBoardPanel.getComponent(Y * boardSize + X);
 
-                if (colorString.equals("WHITE")) {
-                    color = StoneColor.WHITE;
-                } else if (colorString.equals("BLACK")) {
-                    color = StoneColor.BLACK;
-                } else {
-                    continue;
-                }
+            // Usuń wszystkie komponenty z centralnego kwadratu
+            centralSquare.removeAll();
 
-                // Pobierz centralny kwadrat dla każdego pola na planszy
-                JPanel centralSquare = (JPanel) gameBoardPanel.getComponent(y * boardSize + x);
+            // Przerysuj centralny kwadrat
+            centralSquare.revalidate();
+            centralSquare.repaint();
 
-                // Usunięcie wcześniejszych komponentów z centralnego kwadratu
-                centralSquare.removeAll();
-
-                // Oblicz położenie do narysowania koła na środku przecięcia
-                int tileSize = gameBoardPanel.getWidth() / boardSize;
-                int centerX = x * tileSize + tileSize / 2;
-                int centerY = y * tileSize + tileSize / 2;
-
-                // Dodanie nowego komponentu reprezentującego kamień jako okrąg na środku przecięcia
-                StoneComponent stoneComponent = new StoneComponent(color);
-                int componentSize = stoneComponent.getPreferredSize().width;
-
-                // Ustawienie rozmiaru kamienia
-                stoneComponent.setSize(componentSize, componentSize);
-
-                // Ustawienie pozycji kamienia na środku przecięcia
-                int componentX = centerX - componentSize / 2;
-                int componentY = centerY - componentSize / 2;
-
-                stoneComponent.setBounds(componentX, componentY, componentSize, componentSize);
-                centralSquare.add(stoneComponent);
-
-                centralSquare.revalidate();
-                centralSquare.repaint();
-            }
+            // Zaktualizuj tablicę Stone, aby odzwierciedlić usunięcie kamienia
+            fields[X][Y].removeStone();
         }
     }
 
+    //usuwanie z dostanymi od serwera współrzędnymi
+    private void receiveCoordinatesAndRemoveStone() {
+        StringBuilder receivedCoordinates = connection.receiveCoordinates();
 
-    //moja próba 2
-    private void updateBoardGraphics(StringBuilder boardState) {
-        String[] boardValues = boardState.toString().split(" ");
-        int index = 2;  // Zaczynamy od trzeciego elementu, pomijając X i Y
+        System.out.println(receivedCoordinates);
 
-        for (int y = 0; y < boardSize; y++) {
-            for (int x = 0; x < boardSize; x++) {
-                StoneColor color;
-                String colorString = boardValues[index++];
+        String receivedString[] = receivedCoordinates.toString().split(" ");
 
-                if (colorString.equals("WHITE")) {
-                    color = StoneColor.WHITE;
-                } else if (colorString.equals("BLACK")) {
-                    color = StoneColor.BLACK;
-                } else {
-                    continue;
-                }
+        int X = Integer.parseInt(receivedString[0]);
+        int Y = Integer.parseInt(receivedString[1]);
 
-                updateStoneGraphics(x, y, color);
+        receivedString[1] = null;
+        receivedString[0] = null;
+
+        int ctr = 2;
+        for (int i = 0; i < 19; i++) {
+            for (int j = 0; j < 19; j++) {
+                fields[i][j].setColor(receivedString[ctr++]);
+                System.out.print(fields[i][j].getColor() + " ");
             }
         }
+        System.out.print("\n");
+
+        // Remove stone at the specified coordinates
+        removeStoneFromBoard(X, Y);
     }
 
 
@@ -278,8 +254,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
             System.out.println("Incorrect move!");
             JOptionPane.showMessageDialog(null, "Miejsce zajęte. Wybierz inne.", "Błąd ruchu", JOptionPane.ERROR_MESSAGE);
         } else {
-            //updateStoneGraphics(X, Y, color);
-            updateWholeBoardGraphics();
+            updateStoneGraphics(X, Y, color);
         }
     }
     @Override

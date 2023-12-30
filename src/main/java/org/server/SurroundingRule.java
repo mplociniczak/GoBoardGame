@@ -3,6 +3,7 @@ package org.server;
 import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
+import org.client.ClientWithBoard;
 
 import static org.server.Board.fields;
 
@@ -43,6 +44,8 @@ public class SurroundingRule implements GoRuleFactory {
             if(checkIfSurrounded(X, Y, allyColor, surroundedStones, visited)){
                 for(Point p : surroundedStones) {
                     fields[p.x][p.y].removeStone();
+                    //usuwanie kamienia na planszy GUI
+                    ClientWithBoard.removeStoneFromBoard(p.x, p.y);
                 }
                 surroundedStones.clear();
             }
@@ -94,7 +97,7 @@ public class SurroundingRule implements GoRuleFactory {
 
     }
 
-    boolean isValidCoordinate(int x, int y) {
+    public static boolean isValidCoordinate(int x, int y) {
         return x >= 0 && x < 19 && y >= 0 && y < 19;
     }
 }
