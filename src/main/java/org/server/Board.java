@@ -31,7 +31,7 @@ public class Board {
         return fields[X][Y].getState().equals(IntersectionState.EMPTY);
     }
 
-    private boolean isStoneBreathing(int X, int Y) {
+    public boolean isStoneBreathing(int X, int Y) {
         return fields[X + 1][Y].getState().equals(IntersectionState.EMPTY) ||
                 fields[X - 1][Y].getState().equals(IntersectionState.EMPTY) ||
                 fields[X][Y + 1].getState().equals(IntersectionState.EMPTY) ||

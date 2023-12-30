@@ -27,6 +27,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private final ConnectionHandler connection;
     private boolean myTurn;
     private static Stone[][] fields;
+    private ScoreCalculator scoreCalculator; // Add ScoreCalculator instance
 
     public ClientWithBoard() {
 
@@ -45,6 +46,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
         createUI();
         setVisible(true);
+        scoreCalculator = new ScoreCalculator(fields, ter_B, ter_W, pris_B, pris_W, scr_B, scr_W);
     }
 
     private void createUI() {
@@ -223,6 +225,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
             JOptionPane.showMessageDialog(null, "Miejsce zajęte. Wybierz inne.", "Błąd ruchu", JOptionPane.ERROR_MESSAGE);
         } else {
             updateStoneGraphics(X, Y, color);
+            scoreCalculator.updateScoreLabels();
         }
     }
     @Override
