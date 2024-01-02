@@ -14,12 +14,16 @@ public class BuildStandardBoard extends BoardBuilder{
 
     @Override
     public boolean isStoneBreathing(int X, int Y) {
-        return Board.fields[X + 1][Y].getState().equals(IntersectionState.EMPTY) ||
-                Board.fields[X - 1][Y].getState().equals(IntersectionState.EMPTY) ||
-                Board.fields[X][Y + 1].getState().equals(IntersectionState.EMPTY) ||
-                Board.fields[X][Y - 1].getState().equals(IntersectionState.EMPTY) ||
-                isStoneRemovedFlag;
+        int size = Board.size;
+
+        boolean leftEmpty = (X - 1 >= 0) && Board.fields[X - 1][Y].getState().equals(IntersectionState.EMPTY);
+        boolean rightEmpty = (X + 1 < size) && Board.fields[X + 1][Y].getState().equals(IntersectionState.EMPTY);
+        boolean upEmpty = (Y - 1 >= 0) && Board.fields[X][Y - 1].getState().equals(IntersectionState.EMPTY);
+        boolean downEmpty = (Y + 1 < size) && Board.fields[X][Y + 1].getState().equals(IntersectionState.EMPTY);
+
+        return leftEmpty || rightEmpty || upEmpty || downEmpty || isStoneRemovedFlag;
     }
+
 
     @Override
     public boolean isKoViolation() {
