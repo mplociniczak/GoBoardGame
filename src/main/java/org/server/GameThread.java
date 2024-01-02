@@ -1,10 +1,13 @@
 package org.server;
 
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import java.awt.*;
 import java.io.*;
 import java.net.Socket;
 
 public class GameThread implements Runnable {
+    private EntityManagerFactory entityManagerFactory;
     private final static int first = 1;
     private final static int second = 2;
     private final static int errorCode = -1;
@@ -20,6 +23,7 @@ public class GameThread implements Runnable {
         this.firstClientInput = firstClientInput;
         this.secondClientInput = secondClientInput;
         board = new Board();
+        entityManagerFactory = Persistence.createEntityManagerFactory("GoPersistenceUnit");
     }
 
     private void sendMove(ObjectOutputStream out, int X, int Y) throws IOException {
