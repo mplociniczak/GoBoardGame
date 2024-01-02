@@ -1,9 +1,11 @@
 package org.server;
 
+import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import java.awt.*;
 import java.io.*;
+import java.util.List;
 import java.net.Socket;
 
 public class GameThread implements Runnable {
@@ -31,6 +33,24 @@ public class GameThread implements Runnable {
         out.writeObject(board.BoardToStringBuilderWithStoneColors(X, Y));
         out.flush();
     }
+
+    private void saveMoveToDatabase(int turnNumber, int x, int y, StoneColor color) {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        entityManager.getTransaction().begin();
+
+        Move move = new Move();
+        move.setGame(this); // Ustaw aktualną grę
+        move.setTurnNumber(turnNumber);
+        move.setXCoordinate(x);
+        move.setYCoordinate(y);
+        move.setPlayerColor(color);
+
+        entityManager.persist(move);
+
+        entityManager.getTransaction().commit();
+        entityManager.close();
+    }
+
     @Override
     public void run() {
 
@@ -60,6 +80,8 @@ public class GameThread implements Runnable {
                         sendMove(secondClientOutput, X, Y);
                         sendMove(firstClientOutput, X, Y);
 
+                        // Zapisz ruch do bazy danych
+                        saveMoveToDatabase(turn, X, Y, StoneColor.BLACK);
                     } else {
                         sendMove(firstClientOutput, errorCode, errorCode);
                         sendMove(secondClientOutput, errorCode, errorCode);
@@ -80,7 +102,8 @@ public class GameThread implements Runnable {
                         sendMove(firstClientOutput, X, Y);
                         sendMove(secondClientOutput, X, Y);
 
-
+                        // Zapisz ruch do bazy danych
+                        saveMoveToDatabase(turn, X, Y, StoneColor.WHITE);
                     } else {
                         sendMove(secondClientOutput, errorCode, errorCode);
                         sendMove(firstClientOutput, errorCode, errorCode);
@@ -94,5 +117,23 @@ public class GameThread implements Runnable {
         } catch (IOException ex) {
             //TODO: handle
         }
+    }
+
+    private void replayGameFromDatabase() {
+        EntityManager entityManager = entityManagerFactory.createEntityManager();
+        List<Move> moves = entityManager.createQuery("SELECT m FROM Move m WHERE m.game = :game ORDER BY m.turnNumber", Move.class)
+                .setParameter("game", this)
+                .getResultList();
+
+        for (Move move : moves) {
+            // Odtwórz ruch na planszy
+            board.placeStone(move.getXCoordinate(), move.getYCoordinate(), move.getPlayerColor(), getOppositeColor(move.getPlayerColor()));
+        }
+
+        entityManager.close();
+    }
+
+    private StoneColor getOppositeColor(StoneColor color) {
+        return (color == StoneColor.BLACK) ? StoneColor.WHITE : StoneColor.BLACK;
     }
 }
