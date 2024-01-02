@@ -45,48 +45,41 @@ public class GameThread implements Runnable {
 
             while (true) {
                 if (turn == first) {
-
                     X = firstClientInput.readInt();
                     Y = firstClientInput.readInt();
 
-                    if (board.buildBoard.isIntersectionEmpty(X, Y)) {
-
+                    if (X == -1 && Y == -1) {
+                        // Pass - zmiana tury
+                        turn = second;
+                    } else if (board.buildBoard.isIntersectionEmpty(X, Y)) {
                         board.placeStone(X, Y, StoneColor.BLACK, StoneColor.WHITE);
-
                         sendMove(secondClientOutput, X, Y);
                         sendMove(firstClientOutput, X, Y);
-
+                        turn = second;
                     } else {
                         sendMove(firstClientOutput, errorCode, errorCode);
                         sendMove(secondClientOutput, errorCode, errorCode);
                     }
-
-                    turn = second;
-
                 }
 
                 if (turn == second) {
                     X = secondClientInput.readInt();
                     Y = secondClientInput.readInt();
 
-                    if (board.buildBoard.isIntersectionEmpty(X, Y)) {
-
+                    if (X == -1 && Y == -1) {
+                        // Pass - zmiana tury
+                        turn = first;
+                    } else if (board.buildBoard.isIntersectionEmpty(X, Y)) {
                         board.placeStone(X, Y, StoneColor.WHITE, StoneColor.BLACK);
-
                         sendMove(firstClientOutput, X, Y);
                         sendMove(secondClientOutput, X, Y);
-
-
+                        turn = first;
                     } else {
                         sendMove(secondClientOutput, errorCode, errorCode);
                         sendMove(firstClientOutput, errorCode, errorCode);
                     }
-
-                    turn = first;
-
                 }
             }
-
         } catch (IOException ex) {
             //TODO: handle
         }

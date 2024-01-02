@@ -4,6 +4,8 @@ import org.server.*;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
@@ -21,6 +23,8 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private JLabel scr_B;  //Score
     private JLabel scr_W;
     private JButton pass;
+    private boolean passClicked = false;
+
     private int gameOption;
     private final static int firstPlayer = 1;
     private final static int secondPlayer = 2;
@@ -136,6 +140,13 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
         scorePanel.add(pass);
 
+        pass.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                handlePassButton();
+            }
+        });
+
         splitPane.add(scorePanel);
 
         add(splitPane);
@@ -246,23 +257,35 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
             while (true) {
                 if (player == firstPlayer) {
-                    //first player's move confirmation
                     receiveCoordinatesAndPlaceStone(StoneColor.BLACK);
-
-                    //second player's move
-                    receiveCoordinatesAndPlaceStone(StoneColor.WHITE);
-
                     myTurn = true;
+
+                    // Dodaj warunek sprawdzający naciśnięcie przycisku "Pass"
+                    if (passClicked) {
+                        passClicked = false; // Zresetuj flagę naciśnięcia przycisku
+                        // Zmiana tury na przeciwnika
+                        myTurn = false;
+                        continue; // Pomiń resztę pętli, aby uniknąć dodatkowego ruchu
+                    }
+
+                    // Przesyłanie informacji o pasie
+                    receiveCoordinatesAndPlaceStone(StoneColor.WHITE);
 
                 } else if (player == secondPlayer) {
-                    //first player's move confirmation
+                    // Przesyłanie informacji o pasie
                     receiveCoordinatesAndPlaceStone(StoneColor.BLACK);
 
                     myTurn = true;
 
-                    //second player's move
-                    receiveCoordinatesAndPlaceStone(StoneColor.WHITE);
+                    // Dodaj warunek sprawdzający naciśnięcie przycisku "Pass"
+                    if (passClicked) {
+                        passClicked = false; // Zresetuj flagę naciśnięcia przycisku
+                        // Zmiana tury na przeciwnika
+                        myTurn = false;
+                        continue; // Pomiń resztę pętli, aby uniknąć dodatkowego ruchu
+                    }
 
+                    receiveCoordinatesAndPlaceStone(StoneColor.WHITE);
                 }
             }
         }
@@ -277,20 +300,43 @@ public class ClientWithBoard extends JFrame implements Runnable {
             }
         }
     }
+
+    private void handlePassButton() {
+        if (myTurn) {
+            // Wysyłanie informacji o pasie do serwera
+            connection.sendCoordinates(-1, -1);
+
+            // Zmiana tury na przeciwnika
+            myTurn = false;
+
+            // Zresetuj flagę naciśnięcia przycisku "Pass"
+            passClicked = false;
+        } else {
+            // Komunikat, że nie jest teraz twoja tura
+            JOptionPane.showMessageDialog(null, "Nie jest teraz twoja tura.", "Błąd tury", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+
+
     private class ClickListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
-            if(myTurn){
-
+            if (myTurn) {
                 Point boardIndices = convertCoordinatesToBoardIndex(e.getX(), e.getY());
-
                 int X = (int) boardIndices.getX();
                 int Y = (int) boardIndices.getY();
 
-                connection.sendCoordinates(X, Y);
+                if (!passClicked) {
+                    connection.sendCoordinates(X, Y);
+                } else {
+                    // Jeśli przycisk "Pass" został wcześniej naciśnięty, wysyłamy specjalne współrzędne -1, -1
+                    connection.sendCoordinates(-1, -1);
+                }
 
                 myTurn = false;
             }
         }
     }
+
 }
