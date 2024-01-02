@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence xmlns="http://xmlns.jcp.org/xml/ns/persistence"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd"
+             version="2.1">
+
+    <persistence-unit name="GoPersistenceUnit" transaction-type="RESOURCE_LOCAL">
+        <class>org.server.Board</class>
+        <class>org.server.BoardBuilder</class>
+        <class>org.server.BotGameThread</class>
+        <class>org.server.BuildStandardBoard</class>
+        <class>org.server.GameThread</class>
+        <class>org.server.IntersectionState</class>
+        <class>org.server.Server</class>
+        <class>org.server.SmartBot</class>
+        <class>org.server.Stone</class>
+        <class>org.server.StoneColor</class>
+        <class>org.server.StoneProperties</class>
+
+        <class>org.client.Client</class>
+        <class>org.client.ClientWithBoard</class>
+        <class>org.client.ConnectionHandler</class>
+        <class>org.client.ScoreCalculator</class>
+        <class>org.client.StartClient</class>
+        <class>org.client.StoneComponent</class>
+        <!-- inne klasy encji, jeśli będą inne -->
+
+        <properties>
+            <!-- Konfiguracja bazy danych, do uzupełnienia nazwa, użytkownik i hasło -->
+            <property name="javax.persistence.jdbc.driver" value="com.mysql.cj.jdbc.Driver"/>
+            <property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/nazwa_bazy"/>
+            <property name="javax.persistence.jdbc.user" value="uzytkownik"/>
+            <property name="javax.persistence.jdbc.password" value="haslo"/>
+
+            <!-- Konfiguracja Hibernate -->
+            <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect"/>
+            <property name="hibernate.hbm2ddl.auto" value="update"/>
+            <property name="hibernate.show_sql" value="true"/>
+        </properties>
+    </persistence-unit>
+
+</persistence>
