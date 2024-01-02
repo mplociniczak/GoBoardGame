@@ -21,6 +21,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private JLabel scr_B;  //Score
     private JLabel scr_W;
     private JButton pass;
+    private JButton replayButton;
     private int gameOption;
     private final static int firstPlayer = 1;
     private final static int secondPlayer = 2;
@@ -135,6 +136,10 @@ public class ClientWithBoard extends JFrame implements Runnable {
         scorePanel.add(scr_W);
 
         scorePanel.add(pass);
+
+        replayButton = new JButton("Replay Game");
+        replayButton.addActionListener(e -> replayGame());
+        scorePanel.add(replayButton);
 
         splitPane.add(scorePanel);
 
@@ -292,5 +297,9 @@ public class ClientWithBoard extends JFrame implements Runnable {
                 myTurn = false;
             }
         }
+    }
+
+    private void replayGame() {
+        // TODO
     }
 }
