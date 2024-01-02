@@ -3,19 +3,15 @@ package org.server;
 import java.awt.*;
 
 public class SmartBot {
-    private Stone[][] fields;
-
-    public SmartBot(Stone[][] fields) {
-        this.fields = fields;
-    }
 
     public Point makeMove() {
-        for (int i = 0; i < 19; i++) {
-            for (int j = 0; j < 19; j++) {
-                if (fields[i][j].getColor().equals(StoneColor.WHITE)) {
+        for (int i = 0; i < Board.size; i++) {
+            for (int j = 0; j < Board.size; j++) {
+                if (Board.fields[i][j].getColor().equals(StoneColor.BLACK)) {
                     // Szukamy pustego miejsca dookoła kamienia przeciwnika
                     Point emptyNeighbor = findEmptyNeighbor(i, j);
                     if (emptyNeighbor != null) {
+                        Board.fields[emptyNeighbor.x][emptyNeighbor.y].placeStone(StoneColor.WHITE);
                         return emptyNeighbor;
                     }
                 }
@@ -23,7 +19,9 @@ public class SmartBot {
         }
 
         // Jeśli nie udało się znaleźć odpowiedniego ruchu, wykonujemy losowy ruch
-        return getRandomMove();
+        Point random = getRandomMove();
+        Board.fields[random.x][random.y].placeStone(StoneColor.WHITE);
+        return random;
     }
 
     private Point findEmptyNeighbor(int x, int y) {
@@ -35,11 +33,11 @@ public class SmartBot {
         };
 
         for (Point neighbor : neighbors) {
-            int neighborX = (int) neighbor.getX();
-            int neighborY = (int) neighbor.getY();
 
-            if (isValidCoordinate(neighborX, neighborY) && fields[neighborX][neighborY].getState().equals(IntersectionState.EMPTY)) {
-                return new Point(neighborX, neighborY);
+            if (isValidCoordinate(neighbor.x, neighbor.y) &&
+                    Board.fields[neighbor.x][neighbor.y].getState().equals(IntersectionState.EMPTY) &&
+                    !Board.fields[neighbor.x][neighbor.y].getColor().equals(StoneColor.REMOVED)) {
+                return new Point(neighbor.x, neighbor.y);
             }
         }
 
@@ -49,17 +47,17 @@ public class SmartBot {
     private Point getRandomMove() {
         // Dla uproszczenia, bot wybierze losowe wolne pole
         while (true) {
-            int x = (int) (Math.random() * 19);
-            int y = (int) (Math.random() * 19);
+            int x = (int) (Math.random() * Board.size);
+            int y = (int) (Math.random() * Board.size);
 
-            if (isValidCoordinate(x, y) && fields[x][y].getState().equals(IntersectionState.EMPTY)) {
+            if (isValidCoordinate(x, y) && Board.fields[x][y].getState().equals(IntersectionState.EMPTY)) {
                 return new Point(x, y);
             }
         }
     }
 
     private boolean isValidCoordinate(int x, int y) {
-        return x >= 0 && x < 19 && y >= 0 && y < 19;
+        return x >= 0 && x < Board.size && y >= 0 && y < Board.size;
     }
 }
 

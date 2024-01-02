@@ -5,15 +5,19 @@ import java.io.*;
 import java.net.Socket;
 
 public class GameThread implements Runnable {
-    Socket firstClientSocket;
-    Socket secondClientSocket;
-    public final static int first = 1;
-    public final static int second = 2;
+    private final static int first = 1;
+    private final static int second = 2;
     private static int turn = first;
+    ObjectOutputStream firstClientOutput;
+    ObjectOutputStream secondClientOutput;
+    ObjectInputStream firstClientInput;
+    ObjectInputStream secondClientInput;
     private Board board;
-    public GameThread(Socket firstClientSocket, Socket secondClientSocket) {
-        this.firstClientSocket = firstClientSocket;
-        this.secondClientSocket = secondClientSocket;
+    public GameThread(ObjectInputStream firstClientInput, ObjectOutputStream firstClientOutput, ObjectInputStream secondClientInput, ObjectOutputStream secondClientOutput) {
+        this.firstClientOutput = firstClientOutput;
+        this.secondClientOutput = secondClientOutput;
+        this.firstClientInput = firstClientInput;
+        this.secondClientInput = secondClientInput;
         board = new Board();
     }
 
@@ -32,12 +36,6 @@ public class GameThread implements Runnable {
         System.out.println("Running...");
 
         try{
-            ObjectOutputStream firstClientOutput = new ObjectOutputStream(firstClientSocket.getOutputStream());
-            ObjectInputStream firstClientInput = new ObjectInputStream(firstClientSocket.getInputStream());
-
-            ObjectOutputStream secondClientOutput = new ObjectOutputStream(secondClientSocket.getOutputStream());
-            ObjectInputStream secondClientInput = new ObjectInputStream(secondClientSocket.getInputStream());
-
             firstClientOutput.writeInt(first);
             firstClientOutput.flush();
 
@@ -46,12 +44,13 @@ public class GameThread implements Runnable {
 
             while (true) {
                 if (turn == first) {
+
                     X = firstClientInput.readInt();
                     Y = firstClientInput.readInt();
 
-                    if (board.isIntersectionEmpty(X, Y) && !board.isKoViolation()) {
+                    if (board.buildBoard.isIntersectionEmpty(X, Y) && !board.buildBoard.isKoViolation()) {
 
-                        board.placeWhiteStone(X, Y);
+                        board.placeBlackStone(X, Y);
 
                         sendMove(secondClientOutput, X, Y);
                         sendMove(firstClientOutput, X, Y);
@@ -69,9 +68,9 @@ public class GameThread implements Runnable {
                     X = secondClientInput.readInt();
                     Y = secondClientInput.readInt();
 
-                    if (board.isIntersectionEmpty(X, Y) && !board.isKoViolation()) {
+                    if (board.buildBoard.isIntersectionEmpty(X, Y) && !board.buildBoard.isKoViolation()) {
 
-                        board.placeBlackStone(X, Y);
+                        board.placeWhiteStone(X, Y);
 
                         sendMove(firstClientOutput, X, Y);
                         sendMove(secondClientOutput, X, Y);
@@ -85,9 +84,6 @@ public class GameThread implements Runnable {
                     turn = first;
 
                 }
-
-                board.printBoardToHelpDebugging();
-
             }
 
         } catch (IOException ex) {

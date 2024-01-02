@@ -3,6 +3,9 @@ package org.client;
 import org.server.*;
 
 import javax.swing.*;
+import java.awt.*;
+import java.util.HashSet;
+import java.util.Set;
 
 class ScoreCalculator {
     private Stone[][] fields;
@@ -25,8 +28,9 @@ class ScoreCalculator {
 
     public void updateScoreLabels() {
         SwingUtilities.invokeLater(() -> {
-            int blackTerritory = calculateTerritory(StoneColor.BLACK);
-            int whiteTerritory = calculateTerritory(StoneColor.WHITE);
+
+            int blackTerritory = calculateTerritory(StoneColor.BLACK, StoneColor.WHITE);
+            int whiteTerritory = calculateTerritory(StoneColor.WHITE, StoneColor.BLACK);
 
             int blackPrisoners = countPrisoners(StoneColor.BLACK);
             int whitePrisoners = countPrisoners(StoneColor.WHITE);
@@ -44,40 +48,52 @@ class ScoreCalculator {
         });
     }
 
-    public int calculateTerritory(StoneColor color) {
+    public int calculateTerritory(StoneColor color, StoneColor enemyColor) {
         int territoryCount = 0;
 
         // Create a 2D array to track visited positions
-        boolean[][] visited = new boolean[19][19];
+        int ctr = 0;
+
 
         for (int i = 0; i < 19; i++) {
             for (int j = 0; j < 19; j++) {
-                if (fields[i][j].getState().equals(IntersectionState.EMPTY) && !visited[i][j]) {
-                    // Perform DFS to count territory
-                    int emptyTerritorySize = dfs(i, j, visited, color);
-                    territoryCount += emptyTerritorySize;
+                if (fields[i][j].getColor().equals(color)) {
+                    // Perform DFS to count territorY
+                    ctr += checkIfSurrounded(i, j, ctr, new HashSet<>());
+                    territoryCount = ctr;
                 }
             }
         }
 
         return territoryCount;
     }
+    public boolean isValidCoordinate(int x, int y) {
+        return x >= 0 && x < 19 && y >= 0 && y < 19;
+    }
 
-    private int dfs(int x, int y, boolean[][] visited, StoneColor color) {
-        if (x < 0 || x >= 19 || y < 0 || y >= 19 || visited[x][y] || fields[x][y].getState().equals(IntersectionState.OCCUPIED)) {
+    private int checkIfSurrounded(int X, int Y, int ctr, Set<Point> visited) {
+
+        visited.add(new Point(X , Y));
+
+        if(isValidCoordinate(X, Y) && fields[X][Y].getState().equals(IntersectionState.OCCUPIED)) {
             return 0;
         }
 
-        visited[x][y] = true;
+        if(isValidCoordinate(X+1, Y) && fields[X+1][Y].getState().equals(IntersectionState.EMPTY) && !visited.contains(new Point(X+1, Y))) {
+            ctr += checkIfSurrounded(X+1, Y, ctr, visited);
+        }
+        if(isValidCoordinate(X-1, Y) && fields[X-1][Y].getState().equals(IntersectionState.EMPTY) && !visited.contains(new Point(X-1, Y))) {
+            ctr += checkIfSurrounded(X-1, Y, ctr, visited);
+        }
+        if(isValidCoordinate(X, Y+1) && fields[X][Y+1].getState().equals(IntersectionState.EMPTY) && !visited.contains(new Point(X, Y+1))) {
+            ctr += checkIfSurrounded(X, Y+1, ctr, visited);
+        }
+        if(isValidCoordinate(X, Y-1) && fields[X][Y-1].getState().equals(IntersectionState.EMPTY) && !visited.contains(new Point(X, Y-1))) {
+            ctr += checkIfSurrounded(X, Y-1, ctr, visited);
+        }
 
-        int emptyTerritorySize = 1;
+        return 1;
 
-        emptyTerritorySize += dfs(x + 1, y, visited, color);
-        emptyTerritorySize += dfs(x - 1, y, visited, color);
-        emptyTerritorySize += dfs(x, y + 1, visited, color);
-        emptyTerritorySize += dfs(x, y - 1, visited, color);
-
-        return emptyTerritorySize;
     }
 
 
@@ -86,7 +102,8 @@ class ScoreCalculator {
 
         for (int i = 0; i < 19; i++) {
             for (int j = 0; j < 19; j++) {
-                if (fields[i][j].getColor() == color && fields[i][j].getColor().equals(StoneColor.REMOVED)) {
+                //always false
+                if (fields[i][j].getColor().equals(color) && fields[i][j].getColor().equals(StoneColor.REMOVED)) {
                     // Increment the prisoner count for stones of the specified color marked as prisoners
                     prisonerCount++;
                 }

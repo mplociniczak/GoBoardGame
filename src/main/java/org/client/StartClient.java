@@ -5,8 +5,6 @@ package org.client;
  */
 public class StartClient {
     public static void main(String[] args) {
-
-        Thread t1 = new Thread(new ClientWithBoard());
-        t1.start();
+        new Client();
     }
 }

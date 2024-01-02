@@ -28,7 +28,7 @@ public class TestClientServerConnection {
         // wątek pierwszego klienta
         Thread firstClientThread = new Thread(() -> {
             // tworzenie pierwszego klienta
-            ConnectionHandler clientConnection = new ConnectionHandler("localhost", 6670);
+            ConnectionHandler clientConnection = new ConnectionHandler("localhost", 6670, 0);
 
             // test wysłania współrzednych
             clientConnection.sendCoordinates(1, 8);

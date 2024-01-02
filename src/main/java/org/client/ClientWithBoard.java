@@ -21,6 +21,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private JLabel scr_B;  //Score
     private JLabel scr_W;
     private JButton pass;
+    private int gameOption;
     private final static int firstPlayer = 1;
     private final static int secondPlayer = 2;
     private final static int boardSize = 19;
@@ -29,13 +30,15 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private static Stone[][] fields;
     private ScoreCalculator scoreCalculator; // Add ScoreCalculator instance
 
-    public ClientWithBoard() {
+    public ClientWithBoard(int gameOption) {
 
         setTitle("Go Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(900, 550);
 
-        connection = new ConnectionHandler("localhost", Server.port);
+        this.gameOption = gameOption;
+
+        connection = new ConnectionHandler("localhost", Server.port, gameOption);
 
         fields = new Stone[19][19];
         for (int i = 0; i < 19; i++) {
@@ -47,6 +50,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
         createUI();
         setVisible(true);
         scoreCalculator = new ScoreCalculator(fields, ter_B, ter_W, pris_B, pris_W, scr_B, scr_W);
+
     }
 
     private void createUI() {
@@ -187,10 +191,11 @@ public class ClientWithBoard extends JFrame implements Runnable {
             for(int j = 0; j < boardSize; j++) {
                 if(fields[i][j].getColor().equals(StoneColor.REMOVED)) {
                     JPanel centralSquare = (JPanel) gameBoardPanel.getComponent(j * boardSize + i);
-                    // Usuń wszystkie komponenty z centralnego kwadratu
+
                     centralSquare.removeAll();
-                    // Przerysuj centralny kwadrat
+
                     centralSquare.revalidate();
+
                     centralSquare.repaint();
                 }
             }
@@ -230,31 +235,45 @@ public class ClientWithBoard extends JFrame implements Runnable {
     }
     @Override
     public void run() {
-        int player = connection.receiveTurn();
 
-        myTurn = (player == 1);
+        //2 players game
+        if(gameOption == 0){
+            int player = connection.receiveTurn();
 
-        System.out.println(player);
+            myTurn = (player == 1);
 
-        while (true) {
-            if (player == firstPlayer) {
-                //first player's move confirmation
-                receiveCoordinatesAndPlaceStone(StoneColor.WHITE);
+            System.out.println(player);
 
-                //second player's move
+            while (true) {
+                if (player == firstPlayer) {
+                    //first player's move confirmation
+                    receiveCoordinatesAndPlaceStone(StoneColor.BLACK);
+
+                    //second player's move
+                    receiveCoordinatesAndPlaceStone(StoneColor.WHITE);
+
+                    myTurn = true;
+
+                } else if (player == secondPlayer) {
+                    //first player's move confirmation
+                    receiveCoordinatesAndPlaceStone(StoneColor.BLACK);
+
+                    myTurn = true;
+
+                    //second player's move
+                    receiveCoordinatesAndPlaceStone(StoneColor.WHITE);
+
+                }
+            }
+        }
+        //Game with bot
+        else if(gameOption == 1) {
+            myTurn = true;
+
+            while(true) {
                 receiveCoordinatesAndPlaceStone(StoneColor.BLACK);
-
-                myTurn = true;
-
-            } else if (player == secondPlayer) {
-                //first player's move confirmation
                 receiveCoordinatesAndPlaceStone(StoneColor.WHITE);
-
                 myTurn = true;
-
-                //second player's move
-                receiveCoordinatesAndPlaceStone(StoneColor.BLACK);
-
             }
         }
     }

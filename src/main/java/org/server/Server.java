@@ -1,6 +1,6 @@
 package org.server;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -24,16 +24,44 @@ public class Server {
             System.out.println("server exception" + ex.getMessage());
         }
 
+        int mode;
         while(true) {
             try {
                 //Client creates a new game, each game has separate thread
                 firstClientSocket = serverSocket.accept();
                 System.out.println("First client connected");
 
+                ObjectInputStream firstClientInput = new ObjectInputStream(firstClientSocket.getInputStream());
+                ObjectOutputStream firstClientOutput = new ObjectOutputStream(firstClientSocket.getOutputStream());
+
+                mode = firstClientInput.readInt();
+                System.out.println(mode);
+
+                if(mode == 1) {
+                    BotGameThread currentBotGame = new BotGameThread(firstClientInput, firstClientOutput);
+
+                    new Thread(currentBotGame).start();
+
+                    continue;
+                }
+
                 secondClientSocket = serverSocket.accept();
                 System.out.println("Second client connected");
 
-                GameThread currentGame = new GameThread(firstClientSocket, secondClientSocket);
+                ObjectInputStream secondClientInput = new ObjectInputStream(secondClientSocket.getInputStream());
+                ObjectOutputStream secondClientOutput = new ObjectOutputStream(secondClientSocket.getOutputStream());
+
+                mode = secondClientInput.readInt();
+
+                if(mode == 1) {
+                    BotGameThread currentBotGame = new BotGameThread(firstClientInput, firstClientOutput);
+
+                    new Thread(currentBotGame).start();
+
+                    continue;
+                }
+
+                GameThread currentGame = new GameThread(firstClientInput, firstClientOutput, secondClientInput, secondClientOutput);
 
                 new Thread(currentGame).start();
 
