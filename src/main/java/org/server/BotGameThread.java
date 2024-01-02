@@ -34,9 +34,9 @@ public class BotGameThread implements Runnable {
                 X = firstClientInput.readInt();
                 Y = firstClientInput.readInt();
 
-                if (board.buildBoard.isIntersectionEmpty(X, Y) && !board.buildBoard.isKoViolation()) {
+                if (board.buildBoard.isIntersectionEmpty(X, Y)) {
 
-                    board.placeBlackStone(X, Y);
+                    board.placeStone(X, Y, StoneColor.BLACK, StoneColor.WHITE);
 
                     sendMove(firstClientOutput, X, Y);
 

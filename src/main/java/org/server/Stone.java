@@ -17,4 +17,9 @@ public class Stone extends StoneProperties {
             throw new IllegalStateException("No stone to remove at this intersection.");
         }
     }
+    public void deleteStone() {
+        this.setColor(StoneColor.N);
+        this.setState(IntersectionState.EMPTY);
+    }
+
 }

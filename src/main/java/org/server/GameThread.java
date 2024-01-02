@@ -7,6 +7,7 @@ import java.net.Socket;
 public class GameThread implements Runnable {
     private final static int first = 1;
     private final static int second = 2;
+    private final static int errorCode = -1;
     private static int turn = first;
     ObjectOutputStream firstClientOutput;
     ObjectOutputStream secondClientOutput;
@@ -48,16 +49,16 @@ public class GameThread implements Runnable {
                     X = firstClientInput.readInt();
                     Y = firstClientInput.readInt();
 
-                    if (board.buildBoard.isIntersectionEmpty(X, Y) && !board.buildBoard.isKoViolation()) {
+                    if (board.buildBoard.isIntersectionEmpty(X, Y)) {
 
-                        board.placeBlackStone(X, Y);
+                        board.placeStone(X, Y, StoneColor.BLACK, StoneColor.WHITE);
 
                         sendMove(secondClientOutput, X, Y);
                         sendMove(firstClientOutput, X, Y);
 
                     } else {
-                        sendMove(firstClientOutput, -1, -1);
-                        sendMove(secondClientOutput, -1, -1);
+                        sendMove(firstClientOutput, errorCode, errorCode);
+                        sendMove(secondClientOutput, errorCode, errorCode);
                     }
 
                     turn = second;
@@ -68,17 +69,17 @@ public class GameThread implements Runnable {
                     X = secondClientInput.readInt();
                     Y = secondClientInput.readInt();
 
-                    if (board.buildBoard.isIntersectionEmpty(X, Y) && !board.buildBoard.isKoViolation()) {
+                    if (board.buildBoard.isIntersectionEmpty(X, Y)) {
 
-                        board.placeWhiteStone(X, Y);
+                        board.placeStone(X, Y, StoneColor.WHITE, StoneColor.BLACK);
 
                         sendMove(firstClientOutput, X, Y);
                         sendMove(secondClientOutput, X, Y);
 
 
                     } else {
-                        sendMove(secondClientOutput, -1, -1);
-                        sendMove(firstClientOutput, -1, -1);
+                        sendMove(secondClientOutput, errorCode, errorCode);
+                        sendMove(firstClientOutput, errorCode, errorCode);
                     }
 
                     turn = first;

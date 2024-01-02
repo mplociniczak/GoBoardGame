@@ -37,26 +37,13 @@ public class Board {
         return boardStateBuilder;
     }
 
-    public void placeBlackStone(int X, int Y) {
-        fields[X][Y].placeStone(StoneColor.BLACK);
+    public void placeStone(int X, int Y, StoneColor color, StoneColor enemyColor) {
+        fields[X][Y].placeStone(color);
 
-        buildBoard.searchForAdjacentEnemyStones(X, Y, StoneColor.WHITE, StoneColor.BLACK);
-        //searchForAdjacentEnemyStones(X, Y, StoneColor.WHITE, StoneColor.BLACK);
+        buildBoard.searchForAdjacentEnemyStones(X, Y, enemyColor, color);
 
-        if(!buildBoard.isStoneBreathing(X, Y)) {
-            fields[X][Y].removeStone();
-            X = -1;
-            Y = -1;
-        }
-    }
-
-    public void placeWhiteStone(int X, int Y) {
-        fields[X][Y].placeStone(StoneColor.WHITE);
-
-        buildBoard.searchForAdjacentEnemyStones(X, Y, StoneColor.BLACK, StoneColor.WHITE);
-
-        if(!buildBoard.isStoneBreathing(X, Y)) {
-            fields[X][Y].removeStone();
+        if(!buildBoard.isStoneBreathing(X, Y) || buildBoard.isKoViolation()) {
+            fields[X][Y].deleteStone();
             X = -1;
             Y = -1;
         }
