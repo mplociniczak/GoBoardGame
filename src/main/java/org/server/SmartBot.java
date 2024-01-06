@@ -24,7 +24,7 @@ public class SmartBot {
         return random;
     }
 
-    private Point findEmptyNeighbor(int x, int y) {
+    public Point findEmptyNeighbor(int x, int y) {
         Point[] neighbors = {
                 new Point(x + 1, y),
                 new Point(x - 1, y),
@@ -44,7 +44,7 @@ public class SmartBot {
         return null;
     }
 
-    private Point getRandomMove() {
+    public Point getRandomMove() {
         // Dla uproszczenia, bot wybierze losowe wolne pole
         while (true) {
             int x = (int) (Math.random() * Board.size);
@@ -56,7 +56,7 @@ public class SmartBot {
         }
     }
 
-    private boolean isValidCoordinate(int x, int y) {
+    public boolean isValidCoordinate(int x, int y) {
         return x >= 0 && x < Board.size && y >= 0 && y < Board.size;
     }
 }
