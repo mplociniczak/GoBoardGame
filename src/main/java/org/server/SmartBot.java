@@ -2,8 +2,17 @@ package org.server;
 
 import java.awt.*;
 
+/**
+ * The SmartBot class represents a simple Go game bot that makes moves based on a specific strategy.
+ * It searches for enemy stones on the board and attempts to place its stones in empty positions nearby.
+ */
 public class SmartBot {
 
+    /**
+     * Makes a move on the Go game board based on a specific strategy.
+     *
+     * @return The Point representing the coordinates of the move.
+     */
     public Point makeMove() {
         for (int i = 0; i < Board.size; i++) {
             for (int j = 0; j < Board.size; j++) {
@@ -24,6 +33,13 @@ public class SmartBot {
         return random;
     }
 
+    /**
+     * Finds an empty neighbor position around a specified coordinate.
+     *
+     * @param x The x-coordinate of the reference position.
+     * @param y The y-coordinate of the reference position.
+     * @return The Point representing the coordinates of the empty neighbor, or null if not found.
+     */
     public Point findEmptyNeighbor(int x, int y) {
         Point[] neighbors = {
                 new Point(x + 1, y),
@@ -44,6 +60,11 @@ public class SmartBot {
         return null;
     }
 
+    /**
+     * Generates a random valid move on the Go game board.
+     *
+     * @return The Point representing the coordinates of the random move.
+     */
     public Point getRandomMove() {
         // Dla uproszczenia, bot wybierze losowe wolne pole
         while (true) {
@@ -56,6 +77,13 @@ public class SmartBot {
         }
     }
 
+    /**
+     * Checks if the specified coordinates are valid on the game board.
+     *
+     * @param x The x-coordinate.
+     * @param y The y-coordinate.
+     * @return True if the coordinates are valid, false otherwise.
+     */
     public boolean isValidCoordinate(int x, int y) {
         return x >= 0 && x < Board.size && y >= 0 && y < Board.size;
     }

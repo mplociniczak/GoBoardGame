@@ -4,14 +4,33 @@ import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * The BuildStandardBoard class is responsible for implementing the BoardBuilder interface
+ * and providing standard functionality for checking the state of intersections on the Go board.
+ */
 public class BuildStandardBoard extends BoardBuilder{
     private boolean isStoneRemovedFlag = false;
     private Set<String> previousBoardStates = new HashSet<>();
+
+    /**
+     * Checks whether the intersection at the specified coordinates is empty.
+     *
+     * @param X The X-coordinate of the intersection.
+     * @param Y The Y-coordinate of the intersection.
+     * @return True if the intersection is empty, false otherwise.
+     */
     @Override
     public boolean isIntersectionEmpty(int X, int Y) {
         return Board.fields[X][Y].getState().equals(IntersectionState.EMPTY);
     }
 
+    /**
+     * Checks if a stone at the specified coordinates has breathing space (liberties).
+     *
+     * @param X The X-coordinate of the stone.
+     * @param Y The Y-coordinate of the stone.
+     * @return True if the stone has breathing space, false otherwise.
+     */
     @Override
     public boolean isStoneBreathing(int X, int Y) {
         int size = Board.size;
@@ -24,7 +43,11 @@ public class BuildStandardBoard extends BoardBuilder{
         return leftEmpty || rightEmpty || upEmpty || downEmpty || isStoneRemovedFlag;
     }
 
-
+    /**
+     * Checks if a move violates the Ko rule by repeating a previous board state.
+     *
+     * @return True if the move violates Ko, false otherwise.
+     */
     @Override
     public boolean isKoViolation() {
         StringBuilder boardStateBuilder = new StringBuilder();
@@ -36,11 +59,26 @@ public class BuildStandardBoard extends BoardBuilder{
         return !previousBoardStates.add(boardStateBuilder.toString());
     }
 
+    /**
+     * Checks if the given coordinates are valid on the board.
+     *
+     * @param x The X-coordinate.
+     * @param y The Y-coordinate.
+     * @return True if the coordinates are valid, false otherwise.
+     */
     @Override
     public boolean isValidCoordinate(int x, int y) {
         return x >= 0 && x < Board.size && y >= 0 && y < Board.size;
     }
 
+    /**
+     * Searches for and removes adjacent enemy stones at the specified coordinates.
+     *
+     * @param X          The X-coordinate to start searching from.
+     * @param Y          The Y-coordinate to start searching from.
+     * @param enemyColor The color of the enemy stones.
+     * @param allyColor  The color of the ally stones.
+     */
     @Override
     public void searchForAdjacentEnemyStones(int X, int Y, StoneColor enemyColor, StoneColor allyColor) {
         stoneRemover(X+1, Y, enemyColor, allyColor);
@@ -49,6 +87,14 @@ public class BuildStandardBoard extends BoardBuilder{
         stoneRemover(X, Y-1, enemyColor, allyColor);
     }
 
+    /**
+     * Removes stones at the specified coordinates if they are surrounded.
+     *
+     * @param X          The X-coordinate of the stone to remove.
+     * @param Y          The Y-coordinate of the stone to remove.
+     * @param enemyColor The color of the enemy stones.
+     * @param allyColor  The color of the ally stones.
+     */
     @Override
     public void stoneRemover(int X, int Y, StoneColor enemyColor, StoneColor allyColor) {
         Set<Point> surroundedStones = new HashSet<>();
@@ -64,6 +110,17 @@ public class BuildStandardBoard extends BoardBuilder{
         }
     }
 
+
+    /**
+     * Checks if stones at the specified coordinates are surrounded by ally stones.
+     *
+     * @param X          The X-coordinate to start checking from.
+     * @param Y          The Y-coordinate to start checking from.
+     * @param enemyColor The color of the enemy stones.
+     * @param surroundedStones The set to store surrounded stones.
+     * @param visited    The set to store visited coordinates.
+     * @return True if the stones are surrounded, false otherwise.
+     */
     @Override
     public boolean checkIfSurrounded(int X, int Y, StoneColor enemyColor, Set<Point> surroundedStones, Set<Point> visited) {
         boolean isSurrounded;
