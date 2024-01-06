@@ -5,16 +5,29 @@ import org.server.StoneColor;
 import javax.swing.*;
 import java.awt.*;
 
-// Klasa reprezentująca komponent kamienia (okrąg)
+/**
+ * The StoneComponent class represents a graphical component for displaying a Go game stone on the game board.
+ * It extends JComponent and provides a visual representation of a stone with a specified color.
+ */
 public class StoneComponent extends JComponent {
     private StoneColor color;
 
+    /**
+     * Constructs a StoneComponent with the specified color.
+     *
+     * @param color The color of the stone (StoneColor.BLACK or StoneColor.WHITE).
+     */
     public StoneComponent(StoneColor color) {
         this.color = color;
 
         setPreferredSize(new Dimension(15, 15));
     }
 
+    /**
+     * Overrides the paintComponent method to customize the rendering of the stone on the component.
+     *
+     * @param g The Graphics object used for painting.
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);

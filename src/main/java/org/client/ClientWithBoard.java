@@ -8,7 +8,25 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
 /**
- * Actual version of a client - communicates with server
+ * The {@code ClientWithBoard} class represents the client-side of a Go game with a graphical user interface.
+ * It communicates with the server using the {@link ConnectionHandler} class.
+ *
+ * <p>
+ * The client includes a game board, score panel, and buttons for passing and replaying the game.
+ * It supports both two-player games and games against a bot.
+ * </p>
+ *
+ * <p>
+ * The game board is displayed as a grid of squares, and players can make moves by clicking on the squares.
+ * The game state is updated in real-time based on the server's responses.
+ * </p>
+ *
+ * <p>
+ * The client also utilizes the {@link ScoreCalculator} to calculate and display the scores based on the game state.
+ * </p>
+ *
+ * @author MP, RR
+ * @version 1.0
  */
 public class ClientWithBoard extends JFrame implements Runnable {
     private static JPanel gameBoardPanel;
@@ -31,6 +49,12 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private static Stone[][] fields;
     private ScoreCalculator scoreCalculator; // Add ScoreCalculator instance
 
+
+    /**
+     * Constructs a new {@code ClientWithBoard} with the specified game option.
+     *
+     * @param gameOption The game option: 0 for a two-player game, 1 for a game against a bot.
+     */
     public ClientWithBoard(int gameOption) {
 
         setTitle("Go Game");
@@ -54,6 +78,10 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
     }
 
+
+    /**
+     * Creates the graphical user interface components, including the game board, score panel, and buttons.
+     */
     private void createUI() {
         splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerSize(0);
@@ -146,6 +174,14 @@ public class ClientWithBoard extends JFrame implements Runnable {
         add(splitPane);
     }
 
+
+    /**
+     * Converts pixel coordinates to board indices.
+     *
+     * @param x The x-coordinate in pixels.
+     * @param y The y-coordinate in pixels.
+     * @return A {@link Point} representing the board indices.
+     */
     private Point convertCoordinatesToBoardIndex(int x, int y) {
         int tileSizeX = gameBoardPanel.getWidth() / boardSize;
         int tileSizeY = gameBoardPanel.getHeight() / boardSize;
@@ -157,6 +193,14 @@ public class ClientWithBoard extends JFrame implements Runnable {
         return new Point(X, Y);
     }
 
+
+    /**
+     * Updates the graphical representation of a stone on the game board.
+     *
+     * @param X     The x-coordinate of the stone on the board.
+     * @param Y     The y-coordinate of the stone on the board.
+     * @param color The color of the stone.
+     */
     private void updateStoneGraphics(int X, int Y, StoneColor color) {
         // Pobierz centralny kwadrat, który znajduje się na przecięciu czterech sąsiadujących kwadratów
         JPanel centralSquare = (JPanel) gameBoardPanel.getComponent(Y * boardSize + X);
@@ -190,7 +234,10 @@ public class ClientWithBoard extends JFrame implements Runnable {
         removeStoneFromBoard();
     }
 
-    //metoda do usuwania kamienia na GUI
+
+    /**
+     * Removes stones marked as "REMOVED" from the game board.
+     */
     private void removeStoneFromBoard() {
         for(int i = 0; i < boardSize; i++) {
             for(int j = 0; j < boardSize; j++) {
@@ -207,6 +254,12 @@ public class ClientWithBoard extends JFrame implements Runnable {
         }
     }
 
+
+    /**
+     * Receives coordinates from the server, updates the game state, and places a stone on the board.
+     *
+     * @param color The color of the stone to be placed.
+     */
     private void receiveCoordinatesAndPlaceStone(StoneColor color){
         StringBuilder receivedCoordinates = connection.receiveCoordinates();
 
@@ -238,6 +291,10 @@ public class ClientWithBoard extends JFrame implements Runnable {
             scoreCalculator.updateScoreLabels();
         }
     }
+
+    /**
+     * Runs the client thread, managing the game loop and handling user input.
+     */
     @Override
     public void run() {
 
@@ -282,6 +339,10 @@ public class ClientWithBoard extends JFrame implements Runnable {
             }
         }
     }
+
+    /**
+     * The {@code ClickListener} class represents a mouse click listener for the game board.
+     */
     private class ClickListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -299,6 +360,9 @@ public class ClientWithBoard extends JFrame implements Runnable {
         }
     }
 
+    /**
+     * Initiates the replay of the game.
+     */
     private void replayGame() {
         // TODO
     }
