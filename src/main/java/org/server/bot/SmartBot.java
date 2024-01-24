@@ -1,4 +1,8 @@
-package org.server;
+package org.server.bot;
+
+import org.server.gameLogic.Board;
+import org.server.gameLogic.IntersectionState;
+import org.server.gameLogic.StoneColor;
 
 import java.awt.*;
 

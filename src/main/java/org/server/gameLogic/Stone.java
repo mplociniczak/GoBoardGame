@@ -1,4 +1,4 @@
-package org.server;
+package org.server.gameLogic;
 
 public class Stone extends StoneProperties {
     public void placeStone(StoneColor color) {

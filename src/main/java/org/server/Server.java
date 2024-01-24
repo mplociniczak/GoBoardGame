@@ -1,5 +1,7 @@
 package org.server;
 
+import org.server.bot.BotGameThread;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -7,6 +9,8 @@ import java.util.ArrayList;
 
 public class Server {
     public static final int port = 6660;
+    public final static int errorCode = -1;
+    public final static int passCode = -2;
     public static ArrayList<GameThread> allCurrentGames = new ArrayList<>();
     public static void addGame(GameThread currentGame) { allCurrentGames.add(currentGame); }
     public static void removeGame(GameThread finishedGame) { allCurrentGames.remove(finishedGame); }

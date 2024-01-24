@@ -1,6 +1,6 @@
 package org.client;
 
-import org.server.StoneColor;
+import org.server.gameLogic.StoneColor;
 
 import javax.swing.*;
 import java.awt.*;

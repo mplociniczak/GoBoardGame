@@ -1,13 +1,15 @@
 package org.server;
 
-import java.awt.*;
+import org.server.gameLogic.Board;
+import org.server.gameLogic.StoneColor;
+
 import java.io.*;
-import java.net.Socket;
+
+import static org.server.Server.*;
 
 public class GameThread implements Runnable {
     private final static int first = 1;
     private final static int second = 2;
-    private final static int errorCode = -1;
     private static int turn = first;
     ObjectOutputStream firstClientOutput;
     ObjectOutputStream secondClientOutput;
@@ -33,7 +35,7 @@ public class GameThread implements Runnable {
         int X;
         int Y;
 
-        Server.addGame(this);
+        addGame(this);
         System.out.println("Running...");
 
         try{
@@ -48,36 +50,38 @@ public class GameThread implements Runnable {
                     X = firstClientInput.readInt();
                     Y = firstClientInput.readInt();
 
-                    if (X == -1 && Y == -1) {
-                        // Pass - zmiana tury
-                        turn = second;
+                    if(X == passCode && Y == passCode) {
+                        sendMove(secondClientOutput, passCode, passCode);
+                        sendMove(firstClientOutput, passCode, passCode);
                     } else if (board.buildBoard.isIntersectionEmpty(X, Y)) {
                         board.placeStone(X, Y, StoneColor.BLACK, StoneColor.WHITE);
                         sendMove(secondClientOutput, X, Y);
                         sendMove(firstClientOutput, X, Y);
-                        turn = second;
                     } else {
                         sendMove(firstClientOutput, errorCode, errorCode);
                         sendMove(secondClientOutput, errorCode, errorCode);
                     }
+
+                    turn = second;
                 }
 
                 if (turn == second) {
                     X = secondClientInput.readInt();
                     Y = secondClientInput.readInt();
 
-                    if (X == -1 && Y == -1) {
-                        // Pass - zmiana tury
-                        turn = first;
+                    if(X == passCode && Y == passCode) {
+                        sendMove(firstClientOutput, passCode, passCode);
+                        sendMove(secondClientOutput, passCode, passCode);
                     } else if (board.buildBoard.isIntersectionEmpty(X, Y)) {
                         board.placeStone(X, Y, StoneColor.WHITE, StoneColor.BLACK);
                         sendMove(firstClientOutput, X, Y);
                         sendMove(secondClientOutput, X, Y);
-                        turn = first;
                     } else {
                         sendMove(secondClientOutput, errorCode, errorCode);
                         sendMove(firstClientOutput, errorCode, errorCode);
                     }
+
+                    turn = first;
                 }
             }
         } catch (IOException ex) {

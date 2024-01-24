@@ -1,10 +1,15 @@
-package org.server;
+package org.server.bot;
+
+import org.server.Server;
+import org.server.gameLogic.Board;
+import org.server.gameLogic.StoneColor;
 
 import java.awt.*;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.Socket;
+
+import static org.server.Server.*;
 
 public class BotGameThread implements Runnable {
     ObjectInputStream firstClientInput;
@@ -27,8 +32,8 @@ public class BotGameThread implements Runnable {
     @Override
     public void run() {
         try {
-            int X = 0;
-            int Y = 0;
+            int X;
+            int Y;
 
             while(true) {
                 X = firstClientInput.readInt();
@@ -41,7 +46,7 @@ public class BotGameThread implements Runnable {
                     sendMove(firstClientOutput, X, Y);
 
                 } else {
-                    sendMove(firstClientOutput, -1, -1);
+                    sendMove(firstClientOutput, errorCode, errorCode);
                 }
 
                 Point p = bot.makeMove();

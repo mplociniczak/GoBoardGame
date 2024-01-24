@@ -1,6 +1,9 @@
 package org.client;
 
 import org.server.*;
+import org.server.gameLogic.Board;
+import org.server.gameLogic.Stone;
+import org.server.gameLogic.StoneColor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -8,6 +11,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
+import static org.server.Server.*;
+import static org.server.gameLogic.Board.*;
 
 /**
  * Actual version of a client - communicates with server
@@ -24,11 +30,9 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private JLabel scr_W;
     private JButton pass;
     private boolean passClicked = false;
-
     private int gameOption;
     private final static int firstPlayer = 1;
     private final static int secondPlayer = 2;
-    private final static int boardSize = 19;
     private final ConnectionHandler connection;
     private boolean myTurn;
     private static Stone[][] fields;
@@ -42,11 +46,11 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
         this.gameOption = gameOption;
 
-        connection = new ConnectionHandler("localhost", Server.port, gameOption);
+        connection = new ConnectionHandler("localhost", port, gameOption);
 
-        fields = new Stone[19][19];
-        for (int i = 0; i < 19; i++) {
-            for (int j = 0; j < 19; j++) {
+        fields = new Stone[size][size];
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 fields[i][j] = new Stone();
             }
         }
@@ -62,13 +66,13 @@ public class ClientWithBoard extends JFrame implements Runnable {
         splitPane.setDividerSize(0);
 
         gameBoardPanel = new JPanel();
-        gameBoardPanel.setLayout(new GridLayout(boardSize, boardSize));
+        gameBoardPanel.setLayout(new GridLayout(size, size));
         gameBoardPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
 
         gameBoardPanel.addMouseListener(new ClickListener());
 
-        for (int i = 0; i < boardSize; i++) {
-            for (int j = 0; j < boardSize; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 JPanel square = new JPanel() {
 
                     @Override
@@ -140,11 +144,9 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
         scorePanel.add(pass);
 
-        pass.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                handlePassButton();
-            }
+        pass.addActionListener(e -> {
+            passClicked = true;
+            connection.sendCoordinates(passCode, passCode);
         });
 
         splitPane.add(scorePanel);
@@ -153,26 +155,26 @@ public class ClientWithBoard extends JFrame implements Runnable {
     }
 
     private Point convertCoordinatesToBoardIndex(int x, int y) {
-        int tileSizeX = gameBoardPanel.getWidth() / boardSize;
-        int tileSizeY = gameBoardPanel.getHeight() / boardSize;
+        int tileSizeX = gameBoardPanel.getWidth() / size;
+        int tileSizeY = gameBoardPanel.getHeight() / size;
 
         // Ensure that the indices are within the valid range
-        int X = Math.max(0, Math.min(x / tileSizeX, boardSize - 1));
-        int Y = Math.max(0, Math.min(y / tileSizeY, boardSize - 1));
+        int X = Math.max(0, Math.min(x / tileSizeX, size - 1));
+        int Y = Math.max(0, Math.min(y / tileSizeY, size - 1));
 
         return new Point(X, Y);
     }
 
     private void updateStoneGraphics(int X, int Y, StoneColor color) {
         // Pobierz centralny kwadrat, który znajduje się na przecięciu czterech sąsiadujących kwadratów
-        JPanel centralSquare = (JPanel) gameBoardPanel.getComponent(Y * boardSize + X);
+        JPanel centralSquare = (JPanel) gameBoardPanel.getComponent(Y * size + X);
 
         // Usunięcie wcześniejszych komponentów z centralnego kwadratu
         centralSquare.removeAll();
         //squareToPaintRockOn.removeAll();
 
         // Oblicz położenie do narysowania koła na środku przecięcia
-        int tileSize = gameBoardPanel.getWidth() / boardSize;
+        int tileSize = gameBoardPanel.getWidth() / size;
         int centerX = X * tileSize + tileSize / 2;
         int centerY = Y * tileSize + tileSize / 2;
 
@@ -198,10 +200,10 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
     //metoda do usuwania kamienia na GUI
     private void removeStoneFromBoard() {
-        for(int i = 0; i < boardSize; i++) {
-            for(int j = 0; j < boardSize; j++) {
+        for(int i = 0; i < size; i++) {
+            for(int j = 0; j < size; j++) {
                 if(fields[i][j].getColor().equals(StoneColor.REMOVED)) {
-                    JPanel centralSquare = (JPanel) gameBoardPanel.getComponent(j * boardSize + i);
+                    JPanel centralSquare = (JPanel) gameBoardPanel.getComponent(j * size + i);
 
                     centralSquare.removeAll();
 
@@ -218,7 +220,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
         System.out.println(receivedCoordinates);
 
-        String receivedString[] = receivedCoordinates.toString().split(" ");
+        String[] receivedString = receivedCoordinates.toString().split(" ");
 
         int X = Integer.parseInt(receivedString[0]);
         int Y = Integer.parseInt(receivedString[1]);
@@ -227,8 +229,8 @@ public class ClientWithBoard extends JFrame implements Runnable {
         receivedString[0] = null;
 
         int ctr = 2;
-        for (int i = 0; i < 19; i++) {
-            for (int j = 0; j < 19; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 fields[i][j].setColor(StoneColor.valueOf(receivedString[ctr++]));
                 System.out.print(fields[i][j].getColor() + " ");
             }
@@ -236,9 +238,12 @@ public class ClientWithBoard extends JFrame implements Runnable {
         System.out.print("\n");
 
         //Incorrect move
-        if(X == -1 && Y == -1) {
+        if(X == errorCode && Y == errorCode) {
             System.out.println("Incorrect move!");
             JOptionPane.showMessageDialog(null, "Miejsce zajęte. Wybierz inne.", "Błąd ruchu", JOptionPane.ERROR_MESSAGE);
+        } else if(X == passCode && Y == passCode) {
+            myTurn = false;
+            passClicked = false;
         } else {
             updateStoneGraphics(X, Y, color);
             scoreCalculator.updateScoreLabels();
@@ -251,39 +256,22 @@ public class ClientWithBoard extends JFrame implements Runnable {
         if(gameOption == 0){
             int player = connection.receiveTurn();
 
-            myTurn = (player == 1);
+            myTurn = (player == firstPlayer);
 
             System.out.println(player);
 
             while (true) {
                 if (player == firstPlayer) {
                     receiveCoordinatesAndPlaceStone(StoneColor.BLACK);
-                    myTurn = true;
 
-                    // Dodaj warunek sprawdzający naciśnięcie przycisku "Pass"
-                    if (passClicked) {
-                        passClicked = false; // Zresetuj flagę naciśnięcia przycisku
-                        // Zmiana tury na przeciwnika
-                        myTurn = false;
-                        continue; // Pomiń resztę pętli, aby uniknąć dodatkowego ruchu
-                    }
-
-                    // Przesyłanie informacji o pasie
                     receiveCoordinatesAndPlaceStone(StoneColor.WHITE);
 
+                    myTurn = true;
+
                 } else if (player == secondPlayer) {
-                    // Przesyłanie informacji o pasie
                     receiveCoordinatesAndPlaceStone(StoneColor.BLACK);
 
                     myTurn = true;
-
-                    // Dodaj warunek sprawdzający naciśnięcie przycisku "Pass"
-                    if (passClicked) {
-                        passClicked = false; // Zresetuj flagę naciśnięcia przycisku
-                        // Zmiana tury na przeciwnika
-                        myTurn = false;
-                        continue; // Pomiń resztę pętli, aby uniknąć dodatkowego ruchu
-                    }
 
                     receiveCoordinatesAndPlaceStone(StoneColor.WHITE);
                 }
@@ -300,25 +288,6 @@ public class ClientWithBoard extends JFrame implements Runnable {
             }
         }
     }
-
-    private void handlePassButton() {
-        if (myTurn) {
-            // Wysyłanie informacji o pasie do serwera
-            connection.sendCoordinates(-1, -1);
-
-            // Zmiana tury na przeciwnika
-            myTurn = false;
-
-            // Zresetuj flagę naciśnięcia przycisku "Pass"
-            passClicked = false;
-        } else {
-            // Komunikat, że nie jest teraz twoja tura
-            JOptionPane.showMessageDialog(null, "Nie jest teraz twoja tura.", "Błąd tury", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-
-
     private class ClickListener extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent e) {
@@ -327,12 +296,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
                 int X = (int) boardIndices.getX();
                 int Y = (int) boardIndices.getY();
 
-                if (!passClicked) {
-                    connection.sendCoordinates(X, Y);
-                } else {
-                    // Jeśli przycisk "Pass" został wcześniej naciśnięty, wysyłamy specjalne współrzędne -1, -1
-                    connection.sendCoordinates(-1, -1);
-                }
+                connection.sendCoordinates(X, Y);
 
                 myTurn = false;
             }

@@ -1,4 +1,4 @@
-package org.server;
+package org.server.gameLogic;
 
 public class StoneProperties {
     private StoneColor color;

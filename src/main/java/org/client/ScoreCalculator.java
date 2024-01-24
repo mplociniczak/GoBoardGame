@@ -1,11 +1,15 @@
 package org.client;
 
-import org.server.*;
+import org.server.gameLogic.IntersectionState;
+import org.server.gameLogic.Stone;
+import org.server.gameLogic.StoneColor;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
+
+import static org.server.gameLogic.Board.size;
 
 class ScoreCalculator {
     private Stone[][] fields;
@@ -55,8 +59,8 @@ class ScoreCalculator {
         int ctr = 0;
 
 
-        for (int i = 0; i < 19; i++) {
-            for (int j = 0; j < 19; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 if (fields[i][j].getColor().equals(color)) {
                     // Perform DFS to count territorY
                     ctr += checkIfSurrounded(i, j, ctr, new HashSet<>());
@@ -68,7 +72,7 @@ class ScoreCalculator {
         return territoryCount;
     }
     public boolean isValidCoordinate(int x, int y) {
-        return x >= 0 && x < 19 && y >= 0 && y < 19;
+        return x >= 0 && x < size && y >= 0 && y < size;
     }
 
     private int checkIfSurrounded(int X, int Y, int ctr, Set<Point> visited) {
@@ -100,8 +104,8 @@ class ScoreCalculator {
     private int countPrisoners(StoneColor color) {
         int prisonerCount = 0;
 
-        for (int i = 0; i < 19; i++) {
-            for (int j = 0; j < 19; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 //always false
                 if (fields[i][j].getColor().equals(color) && fields[i][j].getColor().equals(StoneColor.REMOVED)) {
                     // Increment the prisoner count for stones of the specified color marked as prisoners

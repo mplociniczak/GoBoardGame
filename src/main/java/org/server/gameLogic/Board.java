@@ -1,8 +1,4 @@
-package org.server;
-
-import java.awt.*;
-import java.util.HashSet;
-import java.util.Set;
+package org.server.gameLogic;
 
 public class Board {
     public static final int size = 19;
