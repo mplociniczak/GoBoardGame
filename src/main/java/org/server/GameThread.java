@@ -34,6 +34,7 @@ public class GameThread implements Runnable {
 
         int X;
         int Y;
+        int passCounter = 0;
 
         addGame(this);
         System.out.println("Running...");
@@ -53,6 +54,7 @@ public class GameThread implements Runnable {
                     if(X == passCode && Y == passCode) {
                         sendMove(secondClientOutput, passCode, passCode);
                         sendMove(firstClientOutput, passCode, passCode);
+                        passCounter++;
                     } else if (board.buildBoard.isIntersectionEmpty(X, Y)) {
                         board.placeStone(X, Y, StoneColor.BLACK, StoneColor.WHITE);
                         sendMove(secondClientOutput, X, Y);
@@ -60,6 +62,10 @@ public class GameThread implements Runnable {
                     } else {
                         sendMove(firstClientOutput, errorCode, errorCode);
                         sendMove(secondClientOutput, errorCode, errorCode);
+                    }
+
+                    if(passCounter == 2) {
+                        Server.removeGame(this);
                     }
 
                     turn = second;
@@ -72,6 +78,7 @@ public class GameThread implements Runnable {
                     if(X == passCode && Y == passCode) {
                         sendMove(firstClientOutput, passCode, passCode);
                         sendMove(secondClientOutput, passCode, passCode);
+                        passCounter++;
                     } else if (board.buildBoard.isIntersectionEmpty(X, Y)) {
                         board.placeStone(X, Y, StoneColor.WHITE, StoneColor.BLACK);
                         sendMove(firstClientOutput, X, Y);
@@ -79,6 +86,10 @@ public class GameThread implements Runnable {
                     } else {
                         sendMove(secondClientOutput, errorCode, errorCode);
                         sendMove(firstClientOutput, errorCode, errorCode);
+                    }
+
+                    if(passCounter == 2) {
+                        Server.removeGame(this);
                     }
 
                     turn = first;
