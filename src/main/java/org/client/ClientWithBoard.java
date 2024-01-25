@@ -48,7 +48,6 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private final int gameOption;
     private JButton pass;
     private JButton replayButton;
-    private int gameOption;
     private final static int firstPlayer = 1;
     private final static int secondPlayer = 2;
     private final ConnectionHandler connection;
