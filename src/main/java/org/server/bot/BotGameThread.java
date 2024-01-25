@@ -55,18 +55,14 @@ public class BotGameThread implements Runnable {
     @Override
     public void run() {
         try {
-            int X;
-            int Y;
-
             while(true) {
-                X = firstClientInput.readInt();
-                Y = firstClientInput.readInt();
+                Point coordinates = (Point) firstClientInput.readObject();
 
-                if (board.buildBoard.isIntersectionEmpty(X, Y)) {
+                if (board.buildBoard.isIntersectionEmpty(coordinates.x, coordinates.y)) {
 
-                    board.placeStone(X, Y, StoneColor.BLACK, StoneColor.WHITE);
+                    board.placeStone(coordinates.x, coordinates.x, StoneColor.BLACK, StoneColor.WHITE);
 
-                    sendMove(firstClientOutput, X, Y);
+                    sendMove(firstClientOutput, coordinates.x, coordinates.y);
 
                 } else {
                     sendMove(firstClientOutput, errorCode, errorCode);
@@ -76,7 +72,7 @@ public class BotGameThread implements Runnable {
                 sendMove(firstClientOutput, p.x , p.y);
 
             }
-        } catch(IOException ex) {
+        } catch(IOException | ClassNotFoundException ex) {
             ex.getMessage();
         }
     }

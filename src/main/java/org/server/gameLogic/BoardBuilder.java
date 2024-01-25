@@ -10,6 +10,8 @@ import java.util.Set;
  * the game board based on stone placement and game rules.
  */
 public abstract class BoardBuilder {
+    public abstract void setStoneRemovedFlagToFalse();
+
     /**
      * Checks if the intersection at the specified coordinates is empty.
      *

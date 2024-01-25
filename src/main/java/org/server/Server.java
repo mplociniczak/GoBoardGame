@@ -52,8 +52,8 @@ public class Server {
     public static void main(String[] args) {
 
         ServerSocket serverSocket = null;
-        Socket firstClientSocket;
-        Socket secondClientSocket;
+
+        ArrayList<ClientServerConnectionHandler> waitingClients = new ArrayList<>();
 
         try {
             serverSocket = new ServerSocket(port);
@@ -63,46 +63,35 @@ public class Server {
             System.out.println("server exception" + ex.getMessage());
         }
 
-        int mode;
         while(true) {
             try {
                 //Client creates a new game, each game has separate thread
-                firstClientSocket = serverSocket.accept();
-                System.out.println("First client connected");
+                ClientServerConnectionHandler client = new ClientServerConnectionHandler();
 
-                ObjectInputStream firstClientInput = new ObjectInputStream(firstClientSocket.getInputStream());
-                ObjectOutputStream firstClientOutput = new ObjectOutputStream(firstClientSocket.getOutputStream());
+                assert serverSocket != null;
+                client.initializeSocket(serverSocket);
 
-                mode = firstClientInput.readInt();
-                System.out.println(mode);
+                int mode = client.gameMode();
 
                 if(mode == 1) {
-                    BotGameThread currentBotGame = new BotGameThread(firstClientInput, firstClientOutput);
+
+                    BotGameThread currentBotGame = new BotGameThread(client.clientInput, client.clientOutput);
 
                     new Thread(currentBotGame).start();
 
-                    continue;
+                } else if(mode == 0) {
+                    waitingClients.add(client);
                 }
 
-                secondClientSocket = serverSocket.accept();
-                System.out.println("Second client connected");
+                if(waitingClients.size() == 2) {
 
-                ObjectInputStream secondClientInput = new ObjectInputStream(secondClientSocket.getInputStream());
-                ObjectOutputStream secondClientOutput = new ObjectOutputStream(secondClientSocket.getOutputStream());
+                    GameThread currentGame = new GameThread(waitingClients.get(0).clientInput, waitingClients.get(0).clientOutput,
+                            waitingClients.get(1).clientInput, waitingClients.get(1).clientOutput);
 
-                mode = secondClientInput.readInt();
+                    new Thread(currentGame).start();
 
-                if(mode == 1) {
-                    BotGameThread currentBotGame = new BotGameThread(secondClientInput, secondClientOutput);
-
-                    new Thread(currentBotGame).start();
-
-                    continue;
+                    waitingClients.clear();
                 }
-
-                GameThread currentGame = new GameThread(firstClientInput, firstClientOutput, secondClientInput, secondClientOutput);
-
-                new Thread(currentGame).start();
 
             } catch (IOException e) {
                 System.out.println("I/O error");

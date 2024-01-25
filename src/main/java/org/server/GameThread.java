@@ -36,6 +36,8 @@ public class GameThread implements Runnable {
 
         StoneColor enemyColor = (color == StoneColor.BLACK) ? StoneColor.WHITE : StoneColor.BLACK;
 
+        board.buildBoard.setStoneRemovedFlagToFalse();
+
         if(coordinates.x == passCode) {
 
             sendMove(secondClientOutput, passCode, passCode);
