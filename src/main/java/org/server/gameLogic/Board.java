@@ -1,5 +1,7 @@
 package org.server.gameLogic;
 
+import org.server.Server;
+
 public class Board {
     public static final int size = 19;
     public static Stone[][] fields;
@@ -40,8 +42,7 @@ public class Board {
 
         if(!buildBoard.isStoneBreathing(X, Y) || buildBoard.isKoViolation()) {
             fields[X][Y].deleteStone();
-            X = -1;
-            Y = -1;
+
         }
     }
 }

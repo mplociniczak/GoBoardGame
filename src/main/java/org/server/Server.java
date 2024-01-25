@@ -58,7 +58,7 @@ public class Server {
                 mode = secondClientInput.readInt();
 
                 if(mode == 1) {
-                    BotGameThread currentBotGame = new BotGameThread(firstClientInput, firstClientOutput);
+                    BotGameThread currentBotGame = new BotGameThread(secondClientInput, secondClientOutput);
 
                     new Thread(currentBotGame).start();
 

@@ -3,6 +3,7 @@ package org.server;
 import org.server.gameLogic.Board;
 import org.server.gameLogic.StoneColor;
 
+import java.awt.*;
 import java.io.*;
 
 import static org.server.Server.*;
@@ -29,11 +30,39 @@ public class GameThread implements Runnable {
         out.writeObject(board.BoardToStringBuilderWithStoneColors(X, Y));
         out.flush();
     }
+
+    private void handleUserInputAndSendBackCoordinates(ObjectInputStream clientInput, int passCounter, StoneColor color) throws IOException, ClassNotFoundException {
+
+        Point coordinates = (Point) clientInput.readObject();
+
+        StoneColor enemyColor = (color == StoneColor.BLACK) ? StoneColor.WHITE : StoneColor.BLACK;
+
+        if(coordinates.x == passCode) {
+
+            sendMove(secondClientOutput, passCode, passCode);
+
+            sendMove(firstClientOutput, passCode, passCode);
+
+            passCounter++;
+
+        } else if (board.buildBoard.isIntersectionEmpty(coordinates.x, coordinates.y)) {
+
+            board.placeStone(coordinates.x, coordinates.y, color, enemyColor);
+
+            sendMove(secondClientOutput, coordinates.x, coordinates.y);
+
+            sendMove(firstClientOutput, coordinates.x, coordinates.y);
+
+        } else {
+
+            sendMove(firstClientOutput, errorCode, errorCode);
+
+            sendMove(secondClientOutput, errorCode, errorCode);
+        }
+    }
     @Override
     public void run() {
 
-        int X;
-        int Y;
         int passCounter = 0;
 
         addGame(this);
@@ -48,54 +77,28 @@ public class GameThread implements Runnable {
 
             while (true) {
                 if (turn == first) {
-                    X = firstClientInput.readInt();
-                    Y = firstClientInput.readInt();
-
-                    if(X == passCode && Y == passCode) {
-                        sendMove(secondClientOutput, passCode, passCode);
-                        sendMove(firstClientOutput, passCode, passCode);
-                        passCounter++;
-                    } else if (board.buildBoard.isIntersectionEmpty(X, Y)) {
-                        board.placeStone(X, Y, StoneColor.BLACK, StoneColor.WHITE);
-                        sendMove(secondClientOutput, X, Y);
-                        sendMove(firstClientOutput, X, Y);
-                    } else {
-                        sendMove(firstClientOutput, errorCode, errorCode);
-                        sendMove(secondClientOutput, errorCode, errorCode);
-                    }
+                    handleUserInputAndSendBackCoordinates(firstClientInput, passCounter, StoneColor.BLACK);
 
                     if(passCounter == 2) {
                         Server.removeGame(this);
+                        break;
                     }
 
                     turn = second;
                 }
 
                 if (turn == second) {
-                    X = secondClientInput.readInt();
-                    Y = secondClientInput.readInt();
-
-                    if(X == passCode && Y == passCode) {
-                        sendMove(firstClientOutput, passCode, passCode);
-                        sendMove(secondClientOutput, passCode, passCode);
-                        passCounter++;
-                    } else if (board.buildBoard.isIntersectionEmpty(X, Y)) {
-                        board.placeStone(X, Y, StoneColor.WHITE, StoneColor.BLACK);
-                        sendMove(firstClientOutput, X, Y);
-                        sendMove(secondClientOutput, X, Y);
-                    } else {
-                        sendMove(secondClientOutput, errorCode, errorCode);
-                        sendMove(firstClientOutput, errorCode, errorCode);
-                    }
+                    handleUserInputAndSendBackCoordinates(secondClientInput, passCounter, StoneColor.WHITE);
 
                     if(passCounter == 2) {
                         Server.removeGame(this);
+                        break;
                     }
 
                     turn = first;
                 }
             }
-        } catch (IOException ex) {
+        } catch (IOException | ClassNotFoundException ex) {
             //TODO: handle
         }
     }

@@ -30,8 +30,9 @@ public class ConnectionHandler {
     }
     public void sendCoordinates(int X, int Y){
         try{
-            output.writeInt(X);
-            output.writeInt(Y);
+            output.writeObject(new Point(X, Y));
+            //output.writeInt(X);
+            //output.writeInt(Y);
             output.flush();
         } catch (IOException ex) {
             //TODO: handle
@@ -40,8 +41,7 @@ public class ConnectionHandler {
 
     public StringBuilder receiveCoordinates() {
         try{
-            StringBuilder board = (StringBuilder) input.readObject();//BLACK, BLACK, WHITE, NULL itp
-            return board;
+            return (StringBuilder) input.readObject();
         } catch (IOException | ClassNotFoundException ex) {
             ex.printStackTrace();
         }
@@ -57,12 +57,5 @@ public class ConnectionHandler {
             ex.getMessage();
         }
         return -1;
-    }
-
-    public void waitForPlayerAction(boolean waiting) throws InterruptedException {
-        while (waiting) {
-            Thread.sleep(100);
-        }
-        waiting = true;
     }
 }

@@ -20,17 +20,14 @@ import static org.server.gameLogic.Board.*;
  */
 public class ClientWithBoard extends JFrame implements Runnable {
     private static JPanel gameBoardPanel;
-    private JSplitPane splitPane;
-    private JPanel scorePanel;
     private JLabel ter_B;  //Territory
     private JLabel ter_W;
     private JLabel pris_B;  //Prisoners
     private JLabel pris_W;
     private JLabel scr_B;  //Score
     private JLabel scr_W;
-    private JButton pass;
     private boolean passClicked = false;
-    private int gameOption;
+    private final int gameOption;
     private final static int firstPlayer = 1;
     private final static int secondPlayer = 2;
     private final ConnectionHandler connection;
@@ -62,7 +59,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
     }
 
     private void createUI() {
-        splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerSize(0);
 
         gameBoardPanel = new JPanel();
@@ -113,9 +110,9 @@ public class ClientWithBoard extends JFrame implements Runnable {
         pris_W = new JLabel();
         scr_B = new JLabel();
         scr_W = new JLabel();
-        pass = new JButton("Pass");
+        JButton pass = new JButton("Pass");
 
-        scorePanel = new JPanel();
+        JPanel scorePanel = new JPanel();
         scorePanel.setLayout(new GridLayout(5, 3)); // Two columns
         scorePanel.setBackground(Color.LIGHT_GRAY);
 
@@ -238,10 +235,10 @@ public class ClientWithBoard extends JFrame implements Runnable {
         System.out.print("\n");
 
         //Incorrect move
-        if(X == errorCode && Y == errorCode) {
+        if(X == errorCode) {
             System.out.println("Incorrect move!");
             JOptionPane.showMessageDialog(null, "Miejsce zajęte. Wybierz inne.", "Błąd ruchu", JOptionPane.ERROR_MESSAGE);
-        } else if(X == passCode && Y == passCode) {
+        } else if(X == passCode) {
             myTurn = false;
             passClicked = false;
         } else {
