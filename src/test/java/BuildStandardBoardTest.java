@@ -1,14 +1,15 @@
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
-import org.server.Board;
-import org.server.BuildStandardBoard;
-import org.server.StoneColor;
+import org.server.gameLogic.Board;
+import org.server.gameLogic.BuildStandardBoard;
+import org.server.gameLogic.StoneColor;
+import org.server.gameLogic.BoardBuilder;
 
 public class BuildStandardBoardTest {
 
     @Test
     public void testIsStoneBreathing() {
-        BuildStandardBoard builder = new BuildStandardBoard();
+        BoardBuilder builder = new BuildStandardBoard();
         Board board = new Board();
         board.buildBoard = builder;
 
@@ -24,12 +25,11 @@ public class BuildStandardBoardTest {
 
     @Test
     public void testIsKoViolation() {
-        BuildStandardBoard builder = new BuildStandardBoard();
         Board board = new Board();
-        board.buildBoard = builder;
+
 
         // Assuming initial state
-        assertFalse(builder.isKoViolation());
+        assertFalse(board.buildBoard.isKoViolation());
 
         // Assuming a move is made
         board.placeStone(0, 0, StoneColor.BLACK, StoneColor.WHITE);
@@ -43,14 +43,14 @@ public class BuildStandardBoardTest {
 
         // Assuming the same move is made (ko violation)
         board.placeStone(0, 0, StoneColor.BLACK, StoneColor.WHITE);
-        assertTrue(builder.isKoViolation());
+        assertTrue(board.buildBoard.isKoViolation());
     }
 
     @Test
     public void testIsValidCoordinate() {
-        BuildStandardBoard builder = new BuildStandardBoard();
-        assertTrue(builder.isValidCoordinate(0, 0));
-        assertFalse(builder.isValidCoordinate(-1, 0));
-        assertFalse(builder.isValidCoordinate(0, 20));
+        Board board = new Board();
+        assertTrue(board.buildBoard.isValidCoordinate(0, 0));
+        assertFalse(board.buildBoard.isValidCoordinate(-1, 0));
+        assertFalse(board.buildBoard.isValidCoordinate(0, 20));
     }
 }

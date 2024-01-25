@@ -1,4 +1,7 @@
-package org.server;
+package org.server.database;
+
+import org.server.GameThread;
+import org.server.gameLogic.StoneColor;
 
 import javax.persistence.*;
 

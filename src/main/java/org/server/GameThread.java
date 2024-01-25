@@ -30,7 +30,6 @@ public class GameThread implements Runnable {
         out.writeObject(board.BoardToStringBuilderWithStoneColors(X, Y));
         out.flush();
     }
-
     private void handleUserInputAndSendBackCoordinates(ObjectInputStream clientInput, int passCounter, StoneColor color) throws IOException, ClassNotFoundException {
 
         Point coordinates = (Point) clientInput.readObject();

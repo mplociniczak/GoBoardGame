@@ -47,7 +47,6 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private boolean passClicked = false;
     private final int gameOption;
     private JButton pass;
-    private JButton replayButton;
     private final static int firstPlayer = 1;
     private final static int secondPlayer = 2;
     private final ConnectionHandler connection;
@@ -176,7 +175,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
             connection.sendCoordinates(passCode, passCode);
         });
 
-        replayButton = new JButton("Replay Game");
+        JButton replayButton = new JButton("Replay Game");
         replayButton.addActionListener(e -> replayGame());
         scorePanel.add(replayButton);
 

@@ -77,7 +77,8 @@ public class Board {
 
         if(!buildBoard.isStoneBreathing(X, Y) || buildBoard.isKoViolation()) {
             fields[X][Y].deleteStone();
-
+            X = Server.errorCode;
+            Y = Server.errorCode;
         }
     }
 }

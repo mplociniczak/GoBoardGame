@@ -1,8 +1,8 @@
 import static org.junit.Assert.*;
 import org.junit.Test;
-import org.server.Board;
-import org.server.SmartBot;
-import org.server.StoneColor;
+import org.server.gameLogic.Board;
+import org.server.bot.SmartBot;
+import org.server.gameLogic.StoneColor;
 
 import java.awt.*;
 

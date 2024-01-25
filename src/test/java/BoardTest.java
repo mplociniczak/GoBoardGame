@@ -1,19 +1,22 @@
 import static org.junit.jupiter.api.Assertions.*;
 import org.junit.jupiter.api.Test;
-import org.server.Board;
-import org.server.StoneColor;
+import org.server.gameLogic.Board;
+import org.server.gameLogic.StoneColor;
+import org.server.gameLogic.BoardBuilder;
+import org.server.gameLogic.BuildStandardBoard;
 
 public class BoardTest {
 
     @Test
     public void testBoardInitialization() {
-        Board board = new Board();
+        BoardBuilder board = new BuildStandardBoard();
         assertNotNull(board);
     }
 
     @Test
     public void testIsIntersectionEmpty() {
         Board board = new Board();
+
         assertTrue(board.buildBoard.isIntersectionEmpty(0, 0));
 
     }
@@ -24,7 +27,7 @@ public class BoardTest {
         board.placeStone(0, 0, StoneColor.BLACK, StoneColor.WHITE);
 
         // Assuming fields[0][0] is updated with a black stone
-        assertEquals(StoneColor.BLACK, board.fields[0][0].getColor());
+        assertEquals(StoneColor.BLACK, Board.fields[0][0].getColor());
     }
 
 

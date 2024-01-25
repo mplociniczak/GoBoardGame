@@ -6,16 +6,13 @@ import java.util.Set;
 
 import static org.server.gameLogic.Board.*;
 
-public class BuildStandardBoard extends BoardBuilder {
 /**
  * The BuildStandardBoard class is responsible for implementing the BoardBuilder interface
  * and providing standard functionality for checking the state of intersections on the Go board.
  */
-public class BuildStandardBoard extends BoardBuilder{
+public class BuildStandardBoard extends BoardBuilder {
     private boolean isStoneRemovedFlag = false;
     private final Set<String> previousBoardStates = new HashSet<>();
-    private Set<String> previousBoardStates = new HashSet<>();
-
     /**
      * Checks whether the intersection at the specified coordinates is empty.
      *
@@ -37,7 +34,6 @@ public class BuildStandardBoard extends BoardBuilder{
      */
     @Override
     public boolean isStoneBreathing(int X, int Y) {
-
 
         boolean leftEmpty = (X - 1 >= 0) && fields[X - 1][Y].getState().equals(IntersectionState.EMPTY);
         boolean rightEmpty = (X + 1 < size) && fields[X + 1][Y].getState().equals(IntersectionState.EMPTY);
