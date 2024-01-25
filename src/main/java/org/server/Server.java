@@ -7,13 +7,48 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+/**
+ * The Server class represents the main server for a simple Go game.
+ * It listens for incoming client connections and creates separate game threads for each pair of clients.
+ */
 public class Server {
+
+    /**
+     * The port number on which the server listens for incoming connections.
+     */
     public static final int port = 6660;
     public static final int errorCode = -1;
     public static final int passCode = -2;
+
+    /**
+     * A list containing all currently active game threads.
+     */
     public static ArrayList<GameThread> allCurrentGames = new ArrayList<>();
-    public static void addGame(GameThread currentGame) { allCurrentGames.add(currentGame); }
-    public static void removeGame(GameThread finishedGame) { allCurrentGames.remove(finishedGame); }
+
+    /**
+     * Adds a game thread to the list of currently active games.
+     *
+     * @param currentGame The GameThread to be added.
+     */
+    public static void addGame(GameThread currentGame) {
+        allCurrentGames.add(currentGame);
+    }
+
+    /**
+     * Removes a finished game thread from the list of currently active games.
+     *
+     * @param finishedGame The GameThread to be removed.
+     */
+    public static void removeGame(GameThread finishedGame) {
+        allCurrentGames.remove(finishedGame);
+    }
+
+    /**
+     * The main method of the Server class, responsible for accepting client connections
+     * and creating game threads for each pair of clients.
+     *
+     * @param args Command line arguments (not used).
+     */
     public static void main(String[] args) {
 
         ServerSocket serverSocket = null;
