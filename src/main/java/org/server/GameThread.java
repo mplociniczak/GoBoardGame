@@ -8,15 +8,17 @@ import java.io.*;
 
 import static org.server.Server.*;
 
-public class GameThread implements Runnable {
+public class GameThread implements Runnable, Observer {
     private final static int first = 1;
     private final static int second = 2;
     private static int turn = first;
+    private Subject serverSubject;
     ObjectOutputStream firstClientOutput;
     ObjectOutputStream secondClientOutput;
     ObjectInputStream firstClientInput;
     ObjectInputStream secondClientInput;
     private Board board;
+    private int passCounter = 0;
     public GameThread(ObjectInputStream firstClientInput, ObjectOutputStream firstClientOutput, ObjectInputStream secondClientInput, ObjectOutputStream secondClientOutput) {
         this.firstClientOutput = firstClientOutput;
         this.secondClientOutput = secondClientOutput;
@@ -30,9 +32,11 @@ public class GameThread implements Runnable {
         out.writeObject(board.BoardToStringBuilderWithStoneColors(X, Y));
         out.flush();
     }
-    private void handleUserInputAndSendBackCoordinates(ObjectInputStream clientInput, int passCounter, StoneColor color) throws IOException, ClassNotFoundException {
 
-        Point coordinates = (Point) clientInput.readObject();
+    Point coordinates = new Point();
+    private void handleUserInputAndSendBackCoordinates(ObjectInputStream clientInput, StoneColor color) throws IOException, ClassNotFoundException {
+
+        coordinates = (Point) clientInput.readObject();
 
         StoneColor enemyColor = (color == StoneColor.BLACK) ? StoneColor.WHITE : StoneColor.BLACK;
 
@@ -54,17 +58,19 @@ public class GameThread implements Runnable {
 
             sendMove(firstClientOutput, coordinates.x, coordinates.y);
 
+            passCounter = 0;
+
         } else {
 
             sendMove(firstClientOutput, errorCode, errorCode);
 
             sendMove(secondClientOutput, errorCode, errorCode);
+
+            passCounter = 0;
         }
     }
     @Override
     public void run() {
-
-        int passCounter = 0;
 
         addGame(this);
         System.out.println("Running...");
@@ -78,10 +84,13 @@ public class GameThread implements Runnable {
 
             while (true) {
                 if (turn == first) {
-                    handleUserInputAndSendBackCoordinates(firstClientInput, passCounter, StoneColor.BLACK);
+
+                    handleUserInputAndSendBackCoordinates(firstClientInput, StoneColor.BLACK);
 
                     if(passCounter == 2) {
                         Server.removeGame(this);
+                        sendMove(firstClientOutput, endgameCode, endgameCode);
+                        sendMove(secondClientOutput, endgameCode, endgameCode);
                         break;
                     }
 
@@ -89,10 +98,13 @@ public class GameThread implements Runnable {
                 }
 
                 if (turn == second) {
-                    handleUserInputAndSendBackCoordinates(secondClientInput, passCounter, StoneColor.WHITE);
+
+                    handleUserInputAndSendBackCoordinates(secondClientInput, StoneColor.WHITE);
 
                     if(passCounter == 2) {
                         Server.removeGame(this);
+                        sendMove(firstClientOutput, endgameCode, endgameCode);
+                        sendMove(secondClientOutput, endgameCode, endgameCode);
                         break;
                     }
 
@@ -103,4 +115,8 @@ public class GameThread implements Runnable {
             //TODO: handle
         }
     }
+
+    @Override
+    public void update() { }
+
 }

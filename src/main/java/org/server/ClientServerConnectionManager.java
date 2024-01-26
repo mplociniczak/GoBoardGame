@@ -6,7 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-public class ClientServerConnectionHandler {
+public class ClientServerConnectionManager {
     public Socket clientSocket;
     public ObjectOutputStream clientOutput;
     public ObjectInputStream clientInput;

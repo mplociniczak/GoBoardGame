@@ -19,6 +19,7 @@ public class Server {
     public static final int port = 6660;
     public static final int errorCode = -1;
     public static final int passCode = -2;
+    public static final int endgameCode = -3;
 
     /**
      * A list containing all currently active game threads.
@@ -53,7 +54,7 @@ public class Server {
 
         ServerSocket serverSocket = null;
 
-        ArrayList<ClientServerConnectionHandler> waitingClients = new ArrayList<>();
+        ArrayList<ClientServerConnectionManager> waitingClients = new ArrayList<>();
 
         try {
             serverSocket = new ServerSocket(port);
@@ -63,10 +64,11 @@ public class Server {
             System.out.println("server exception" + ex.getMessage());
         }
 
+
         while(true) {
             try {
                 //Client creates a new game, each game has separate thread
-                ClientServerConnectionHandler client = new ClientServerConnectionHandler();
+                ClientServerConnectionManager client = new ClientServerConnectionManager();
 
                 assert serverSocket != null;
                 client.initializeSocket(serverSocket);

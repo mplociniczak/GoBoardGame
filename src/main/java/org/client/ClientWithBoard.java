@@ -45,6 +45,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private JLabel scr_B;  //Score
     private JLabel scr_W;
     private boolean passClicked = false;
+    private boolean terminateGame = false;
     private final int gameOption;
     private JButton pass;
     private final static int firstPlayer = 1;
@@ -299,6 +300,8 @@ public class ClientWithBoard extends JFrame implements Runnable {
         } else if(X == passCode) {
             myTurn = false;
             passClicked = false;
+        } else if(X == endgameCode) {
+            terminateGame = true;
         } else {
             updateStoneGraphics(X, Y, color);
             scoreCalculator.updateScoreLabels();
@@ -321,6 +324,8 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
             while (true) {
                 if (player == firstPlayer) {
+
+                    if(terminateGame) break;
                     //first player's move confirmation
                     receiveCoordinatesAndPlaceStone(StoneColor.BLACK);
 
@@ -335,6 +340,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
                     myTurn = true;
 
+                    if(terminateGame) break;
                     //second player's move
                     receiveCoordinatesAndPlaceStone(StoneColor.WHITE);
 
