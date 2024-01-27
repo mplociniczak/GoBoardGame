@@ -40,11 +40,33 @@
             <version>5.6.1.Final</version>
         </dependency>
 
-        <!-- Sterownik MySQL -->
+        <!-- MySQL Driver -->
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>8.0.23</version>
+        </dependency>
+
+        <!-- Dodatkowe zależności, które mogą być potrzebne -->
+        <!-- Zależność dla C3P0 (connection pooling) -->
+        <dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.5.5</version>
+        </dependency>
+
+        <!-- Zależności dla obsługi transakcji -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-tx</artifactId>
+            <version>5.3.15</version>
+        </dependency>
+
+        <!-- Zależności do JPA -->
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>5.6.1.Final</version>
         </dependency>
     </dependencies>
 
