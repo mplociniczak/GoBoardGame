@@ -2,9 +2,11 @@ package org.server;
 
 import org.server.gameLogic.Board;
 import org.server.gameLogic.StoneColor;
+import org.server.database.*;
 
 import java.awt.*;
 import java.io.*;
+import java.util.Date;
 
 import static org.server.Server.*;
 
@@ -18,6 +20,10 @@ public class GameThread extends Thread implements Runnable, iGameThread {
     ObjectInputStream secondClientInput;
     private Board board;
     private int passCounter = 0;
+
+    private GameDAO gameDao = new GameDAO();
+    private Game currentGame;
+
     public GameThread(ObjectInputStream firstClientInput, ObjectOutputStream firstClientOutput, ObjectInputStream secondClientInput, ObjectOutputStream secondClientOutput) {
         this.firstClientOutput = firstClientOutput;
         this.secondClientOutput = secondClientOutput;
@@ -74,6 +80,11 @@ public class GameThread extends Thread implements Runnable, iGameThread {
         addGame(this);
         System.out.println("Running...");
 
+        // zapisywanie do bazy przy rozpoczęciu gry
+        currentGame = new Game();
+        currentGame.setStartTime(new Date());
+        gameDao.saveGame(currentGame);
+
         try{
             firstClientOutput.writeInt(first);
             firstClientOutput.flush();
@@ -113,5 +124,9 @@ public class GameThread extends Thread implements Runnable, iGameThread {
         } catch (IOException | ClassNotFoundException ex) {
             //TODO: handle
         }
+
+        // Przy zakończeniu gry
+        currentGame.setEndTime(new Date());
+        gameDao.updateGame(currentGame);
     }
 }

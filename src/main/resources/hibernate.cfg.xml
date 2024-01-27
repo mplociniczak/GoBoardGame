@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!DOCTYPE hibernate-configuration PUBLIC
+        "-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+    <session-factory>
+        <!-- Dane dostępowe do bazy danych -->
+        <property name="hibernate.connection.driver_class">com.mysql.cj.jdbc.Driver</property>
+        <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/games</property>
+        <property name="hibernate.connection.username">root</property>
+        <property name="hibernate.connection.password">Marta2003</property>
+
+        <property name="hibernate.c3p0.min_size">5</property>
+        <property name="hibernate.c3p0.max_size">20</property>
+        <property name="hibernate.c3p0.timeout">300</property>
+        <property name="hibernate.c3p0.max_statements">50</property>
+        <property name="hibernate.c3p0.idle_test_period">3000</property>
+
+        <!-- Konfiguracja dialektu -->
+        <property name="hibernate.dialect">org.hibernate.dialect.MySQLDialect</property>
+
+        <!-- Wyświetlanie zapytań SQL -->
+        <property name="show_sql">true</property>
+
+        <!-- Aktualizacja schematu bazy danych przy starcie -->
+        <property name="hbm2ddl.auto">update</property>
+
+        <!-- Zmapowane klasy encji -->
+        <mapping class="org.server.database.Game"/>
+        <mapping class="org.server.database.Move"/>
+    </session-factory>
+</hibernate-configuration>

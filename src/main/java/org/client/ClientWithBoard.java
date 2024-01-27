@@ -1,6 +1,10 @@
 package org.client;
 
 import org.server.*;
+import org.server.database.Game;
+import org.server.database.GameDAO;
+import org.server.database.Move;
+import org.server.database.MoveDAO;
 import org.server.gameLogic.Board;
 import org.server.gameLogic.Stone;
 import org.server.gameLogic.StoneColor;
@@ -11,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.Date;
 
 import static org.server.Server.*;
 import static org.server.gameLogic.Board.*;
@@ -54,7 +59,8 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private boolean myTurn;
     private static Stone[][] fields;
     private ScoreCalculator scoreCalculator; // Add ScoreCalculator instance
-
+    private StoneColor currentPlayerColor;
+    private Game currentGame;
 
     /**
      * Constructs a new {@code ClientWithBoard} with the specified game option.
@@ -80,10 +86,24 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
         createUI();
         setVisible(true);
+
+        // Inicjalizacja currentGame
+        currentGame = new Game();
+        currentGame.setStartTime(new Date());
+
+        GameDAO gameDao = new GameDAO();
+        gameDao.saveGame(currentGame); // Zapisz grę
+
+        // Ustaw początkowy kolor gracza,
+        currentPlayerColor = StoneColor.BLACK;
+
         scoreCalculator = new ScoreCalculator(fields, ter_B, ter_W, pris_B, pris_W, scr_B, scr_W);
 
     }
 
+    public StoneColor currentPlayerColor() {
+        return currentPlayerColor;
+    }
 
     /**
      * Creates the graphical user interface components, including the game board, score panel, and buttons.
@@ -293,6 +313,13 @@ public class ClientWithBoard extends JFrame implements Runnable {
         }
         System.out.print("\n");
 
+        // Zmiana aktualnego koloru gracza na przeciwny po wykonanym ruchu
+        if (color == StoneColor.BLACK) {
+            currentPlayerColor = StoneColor.WHITE;
+        } else {
+            currentPlayerColor = StoneColor.BLACK;
+        }
+
         //Incorrect move
         if(X == errorCode) {
             System.out.println("Incorrect move!");
@@ -306,6 +333,9 @@ public class ClientWithBoard extends JFrame implements Runnable {
         } else {
             updateStoneGraphics(X, Y, color);
             scoreCalculator.updateScoreLabels();
+
+            // Zapisywanie ruchu do bazy danych
+            saveMoveToDatabase(X, Y, color);
         }
     }
 
@@ -381,9 +411,23 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
                 connection.sendCoordinates(X, Y);
 
+                // Zapisywanie ruchu do bazy danych
+                saveMoveToDatabase(X, Y, currentPlayerColor());
+
                 myTurn = false;
             }
         }
+    }
+
+    private void saveMoveToDatabase(int x, int y, StoneColor color) {
+        Move move = new Move();
+        move.setGame(currentGame);
+        move.setPositionX(x);
+        move.setPositionY(y);
+        move.setStoneColor(color);
+        move.setMoveTime(new Date());
+
+        new MoveDAO().saveMove(move);
     }
 
     /**
