@@ -54,50 +54,56 @@ class ScoreCalculator {
 
     public int calculateTerritory(StoneColor color, StoneColor enemyColor) {
         int territoryCount = 0;
-
-        // Create a 2D array to track visited positions
-        int ctr = 0;
-
-
+        Set<Point> surrounded = new HashSet<>();
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (fields[i][j].getColor().equals(color)) {
                     // Perform DFS to count territorY
-                    ctr += checkIfSurrounded(i, j, ctr, new HashSet<>());
-                    territoryCount = ctr;
+                    if(checkIfSurrounded(i, j, surrounded, new HashSet<>(), enemyColor)){
+                        canBeSurrounded = true;
+                        break;
+                    } else {
+                        canBeSurrounded = true;
+                        surrounded.clear();
+                    }
                 }
             }
         }
 
-        return territoryCount;
+        return surrounded.size();
     }
     public boolean isValidCoordinate(int x, int y) {
         return x >= 0 && x < size && y >= 0 && y < size;
     }
 
-    private int checkIfSurrounded(int X, int Y, int ctr, Set<Point> visited) {
+    boolean canBeSurrounded = true;
+    private boolean checkIfSurrounded(int X, int Y, Set<Point> surrounded, Set<Point> visited, StoneColor enemyColor) {
 
         visited.add(new Point(X , Y));
 
-        if(isValidCoordinate(X, Y) && fields[X][Y].getState().equals(IntersectionState.OCCUPIED)) {
-            return 0;
+        if(isValidCoordinate(X, Y) && fields[X][Y].getColor().equals(enemyColor)) {
+            canBeSurrounded = false;
+            return false;
         }
 
-        if(isValidCoordinate(X+1, Y) && fields[X+1][Y].getState().equals(IntersectionState.EMPTY) && !visited.contains(new Point(X+1, Y))) {
-            ctr += checkIfSurrounded(X+1, Y, ctr, visited);
+        if(isValidCoordinate(X+1, Y) && fields[X+1][Y].getState().equals(IntersectionState.EMPTY) && !visited.contains(new Point(X+1, Y)) && canBeSurrounded) {
+             if(checkIfSurrounded(X+1, Y, surrounded, visited, enemyColor))
+                 surrounded.add(new Point(X+1, Y));
         }
-        if(isValidCoordinate(X-1, Y) && fields[X-1][Y].getState().equals(IntersectionState.EMPTY) && !visited.contains(new Point(X-1, Y))) {
-            ctr += checkIfSurrounded(X-1, Y, ctr, visited);
+        if(isValidCoordinate(X-1, Y) && fields[X-1][Y].getState().equals(IntersectionState.EMPTY) && !visited.contains(new Point(X-1, Y)) && canBeSurrounded) {
+            if(checkIfSurrounded(X-1, Y, surrounded, visited, enemyColor))
+                surrounded.add(new Point(X-1, Y));
         }
-        if(isValidCoordinate(X, Y+1) && fields[X][Y+1].getState().equals(IntersectionState.EMPTY) && !visited.contains(new Point(X, Y+1))) {
-            ctr += checkIfSurrounded(X, Y+1, ctr, visited);
+        if(isValidCoordinate(X, Y+1) && fields[X][Y+1].getState().equals(IntersectionState.EMPTY) && !visited.contains(new Point(X, Y+1)) && canBeSurrounded) {
+            if(checkIfSurrounded(X, Y+1, surrounded, visited, enemyColor))
+                surrounded.add(new Point(X, Y+1));
         }
-        if(isValidCoordinate(X, Y-1) && fields[X][Y-1].getState().equals(IntersectionState.EMPTY) && !visited.contains(new Point(X, Y-1))) {
-            ctr += checkIfSurrounded(X, Y-1, ctr, visited);
+        if(isValidCoordinate(X, Y-1) && fields[X][Y-1].getState().equals(IntersectionState.EMPTY) && !visited.contains(new Point(X, Y-1)) && canBeSurrounded) {
+            if(checkIfSurrounded(X, Y-1, surrounded, visited, enemyColor))
+                surrounded.add(new Point(X, Y-1));
         }
 
-        return 1;
-
+        return canBeSurrounded;
     }
 
 
@@ -107,7 +113,7 @@ class ScoreCalculator {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 //always false
-                if (fields[i][j].getColor().equals(color) && fields[i][j].getColor().equals(StoneColor.REMOVED)) {
+                if (fields[i][j].getColor().equals(StoneColor.REMOVED)) {
                     // Increment the prisoner count for stones of the specified color marked as prisoners
                     prisonerCount++;
                 }

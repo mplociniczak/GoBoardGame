@@ -3,6 +3,7 @@ package org.server.bot;
 import org.server.Server;
 import org.server.gameLogic.Board;
 import org.server.gameLogic.StoneColor;
+import org.server.iGameThread;
 
 import java.awt.*;
 import java.io.IOException;
@@ -15,7 +16,7 @@ import static org.server.Server.*;
  * The BotGameThread class represents a thread for a game against a bot.
  * It handles communication with the first client and orchestrates the game moves against the SmartBot.
  */
-public class BotGameThread implements Runnable {
+public class BotGameThread extends Thread implements Runnable, iGameThread {
     ObjectInputStream firstClientInput;
     ObjectOutputStream firstClientOutput;
     private Board board;
@@ -43,7 +44,7 @@ public class BotGameThread implements Runnable {
      * @param Y   The Y-coordinate of the last move.
      * @throws IOException If an I/O error occurs during the output operation.
      */
-    private void sendMove(ObjectOutputStream out, int X, int Y) throws IOException {
+    public void sendMove(ObjectOutputStream out, int X, int Y) throws IOException {
         System.out.println(board.BoardToStringBuilderWithStoneColors(X, Y));
         out.writeObject(board.BoardToStringBuilderWithStoneColors(X, Y));
         out.flush();
@@ -55,21 +56,26 @@ public class BotGameThread implements Runnable {
     @Override
     public void run() {
         try {
+            Point coordinates;
             while(true) {
-                Point coordinates = (Point) firstClientInput.readObject();
+                coordinates = (Point) firstClientInput.readObject();
 
-                if (board.buildBoard.isIntersectionEmpty(coordinates.x, coordinates.y)) {
+                if (board.buildBoard.isValidCoordinate(coordinates.x, coordinates.y) && board.buildBoard.isIntersectionEmpty(coordinates.x, coordinates.y)) {
 
                     board.placeStone(coordinates.x, coordinates.x, StoneColor.BLACK, StoneColor.WHITE);
 
                     sendMove(firstClientOutput, coordinates.x, coordinates.y);
 
+                } else if (coordinates.x == passCode) {
+                    sendMove(firstClientOutput, endgameCode, endgameCode);
+
+                    this.interrupt();
                 } else {
                     sendMove(firstClientOutput, errorCode, errorCode);
                 }
 
-                Point p = bot.makeMove();
-                sendMove(firstClientOutput, p.x , p.y);
+                coordinates = bot.makeMove();
+                sendMove(firstClientOutput, coordinates.x , coordinates.y);
 
             }
         } catch(IOException | ClassNotFoundException ex) {

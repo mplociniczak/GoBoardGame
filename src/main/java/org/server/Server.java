@@ -24,7 +24,7 @@ public class Server {
     /**
      * A list containing all currently active game threads.
      */
-    public static ArrayList<GameThread> allCurrentGames = new ArrayList<>();
+    public static ArrayList<iGameThread> allCurrentGames = new ArrayList<>();
 
     /**
      * Adds a game thread to the list of currently active games.
@@ -79,7 +79,9 @@ public class Server {
 
                     BotGameThread currentBotGame = new BotGameThread(client.clientInput, client.clientOutput);
 
-                    new Thread(currentBotGame).start();
+                    currentBotGame.start();
+
+                    allCurrentGames.add(currentBotGame);
 
                 } else if(mode == 0) {
                     waitingClients.add(client);
@@ -90,7 +92,8 @@ public class Server {
                     GameThread currentGame = new GameThread(waitingClients.get(0).clientInput, waitingClients.get(0).clientOutput,
                             waitingClients.get(1).clientInput, waitingClients.get(1).clientOutput);
 
-                    new Thread(currentGame).start();
+                    //new Thread(currentGame).start();
+                    currentGame.start();
 
                     waitingClients.clear();
                 }

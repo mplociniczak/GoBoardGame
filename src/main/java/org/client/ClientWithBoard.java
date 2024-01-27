@@ -302,6 +302,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
             passClicked = false;
         } else if(X == endgameCode) {
             terminateGame = true;
+            JOptionPane.showMessageDialog(null, "Koniec gry", "Koniec gry", JOptionPane.PLAIN_MESSAGE);
         } else {
             updateStoneGraphics(X, Y, color);
             scoreCalculator.updateScoreLabels();
@@ -346,16 +347,22 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
                 }
             }
+            System.out.println("Game ended");
         }
         //Game with bot
         else if(gameOption == 1) {
             myTurn = true;
 
             while(true) {
+                if(terminateGame) break;
+
                 receiveCoordinatesAndPlaceStone(StoneColor.BLACK);
+
                 receiveCoordinatesAndPlaceStone(StoneColor.WHITE);
+
                 myTurn = true;
             }
+            System.out.println("Game ended");
         }
     }
 

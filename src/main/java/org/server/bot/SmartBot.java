@@ -53,7 +53,6 @@ public class SmartBot {
         };
 
         for (Point neighbor : neighbors) {
-
             if (isValidCoordinate(neighbor.x, neighbor.y) &&
                     Board.fields[neighbor.x][neighbor.y].getState().equals(IntersectionState.EMPTY) &&
                     !Board.fields[neighbor.x][neighbor.y].getColor().equals(StoneColor.REMOVED)) {

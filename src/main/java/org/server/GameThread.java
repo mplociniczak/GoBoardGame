@@ -8,11 +8,10 @@ import java.io.*;
 
 import static org.server.Server.*;
 
-public class GameThread implements Runnable, Observer {
+public class GameThread extends Thread implements Runnable, iGameThread {
     private final static int first = 1;
     private final static int second = 2;
     private static int turn = first;
-    private Subject serverSubject;
     ObjectOutputStream firstClientOutput;
     ObjectOutputStream secondClientOutput;
     ObjectInputStream firstClientInput;
@@ -27,7 +26,7 @@ public class GameThread implements Runnable, Observer {
         board = new Board();
     }
 
-    private void sendMove(ObjectOutputStream out, int X, int Y) throws IOException {
+    public void sendMove(ObjectOutputStream out, int X, int Y) throws IOException {
         System.out.println(board.BoardToStringBuilderWithStoneColors(X, Y));
         out.writeObject(board.BoardToStringBuilderWithStoneColors(X, Y));
         out.flush();
@@ -91,7 +90,7 @@ public class GameThread implements Runnable, Observer {
                         Server.removeGame(this);
                         sendMove(firstClientOutput, endgameCode, endgameCode);
                         sendMove(secondClientOutput, endgameCode, endgameCode);
-                        break;
+                        this.interrupt();
                     }
 
                     turn = second;
@@ -102,10 +101,10 @@ public class GameThread implements Runnable, Observer {
                     handleUserInputAndSendBackCoordinates(secondClientInput, StoneColor.WHITE);
 
                     if(passCounter == 2) {
-                        Server.removeGame(this);
+                        removeGame(this);
                         sendMove(firstClientOutput, endgameCode, endgameCode);
                         sendMove(secondClientOutput, endgameCode, endgameCode);
-                        break;
+                        this.interrupt();
                     }
 
                     turn = first;
@@ -115,8 +114,4 @@ public class GameThread implements Runnable, Observer {
             //TODO: handle
         }
     }
-
-    @Override
-    public void update() { }
-
 }
