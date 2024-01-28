@@ -1,9 +1,11 @@
 package org.server.gameLogic;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.server.deepCopy.DeepCopy.deepCopy;
 import static org.server.gameLogic.Board.*;
 
 /**
@@ -12,7 +14,8 @@ import static org.server.gameLogic.Board.*;
  */
 public class BuildStandardBoard extends BoardBuilder {
     private boolean isStoneRemovedFlag = false;
-    private final Set<String> previousBoardStates = new HashSet<>();
+    private final ArrayList<ArrayList<String>> previousStates = new ArrayList<>();
+    private Stone[][] localFields = new Stone[size][size];
     @Override
     public void setStoneRemovedFlagToFalse() { isStoneRemovedFlag = false; }
     /**
@@ -52,13 +55,33 @@ public class BuildStandardBoard extends BoardBuilder {
      */
     @Override
     public boolean isKoViolation() {
-        StringBuilder boardStateBuilder = new StringBuilder();
+        //StringBuilder boardStateBuilder = new StringBuilder();
+        ArrayList<String> temp = new ArrayList<>();
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                boardStateBuilder.append(fields[i][j].getState().toString());
+                temp.add(localFields[i][j].getState().toString());
             }
         }
-        return !previousBoardStates.add(boardStateBuilder.toString());
+        boolean contains = previousStates.contains(temp);
+
+        if(!contains) {
+            previousStates.add(temp);
+        }
+
+        if(previousStates.size() > 3) {
+            previousStates.remove(previousStates.get(0));
+        }
+
+        return contains;
+    }
+
+    public boolean checkKoRule() {
+        if(!isKoViolation()){
+            fields = localFields.clone();
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -82,11 +105,16 @@ public class BuildStandardBoard extends BoardBuilder {
      * @param allyColor  The color of the ally stones.
      */
     @Override
-    public void searchForAdjacentEnemyStones(int X, int Y, StoneColor enemyColor, StoneColor allyColor) {
+    public boolean searchForAdjacentEnemyStones(int X, int Y, StoneColor enemyColor, StoneColor allyColor) {
+        localFields = deepCopy(fields);
+        localFields[X][Y].placeStone(allyColor);
+
         stoneRemover(X+1, Y, enemyColor, allyColor);
         stoneRemover(X-1, Y, enemyColor, allyColor);
         stoneRemover(X, Y+1, enemyColor, allyColor);
         stoneRemover(X, Y-1, enemyColor, allyColor);
+
+        return checkKoRule();
     }
 
     /**
@@ -102,10 +130,10 @@ public class BuildStandardBoard extends BoardBuilder {
         Set<Point> surroundedStones = new HashSet<>();
         Set<Point> visited = new HashSet<>();
 
-        if(isValidCoordinate(X, Y) && fields[X][Y].getColor().equals(enemyColor)) {
+        if(isValidCoordinate(X, Y) && localFields[X][Y].getColor().equals(enemyColor)) {
             if(checkIfSurrounded(X, Y, allyColor, surroundedStones, visited)){
                 for(Point p : surroundedStones) {
-                    fields[p.x][p.y].removeStone();
+                    localFields[p.x][p.y].removeStone();
                 }
                 isStoneRemovedFlag = true;
             }
@@ -129,26 +157,26 @@ public class BuildStandardBoard extends BoardBuilder {
 
         visited.add(new Point(X , Y));
 
-        if((isValidCoordinate(X+1, Y) && fields[X+1][Y].getState().equals(IntersectionState.EMPTY))
-                || (isValidCoordinate(X-1, Y) && fields[X-1][Y].getState().equals(IntersectionState.EMPTY))
-                || (isValidCoordinate(X, Y+1) && fields[X][Y+1].getState().equals(IntersectionState.EMPTY))
-                || (isValidCoordinate(X, Y-1) && fields[X][Y-1].getState().equals(IntersectionState.EMPTY))) {
+        if((isValidCoordinate(X+1, Y) && localFields[X+1][Y].getState().equals(IntersectionState.EMPTY))
+                || (isValidCoordinate(X-1, Y) && localFields[X-1][Y].getState().equals(IntersectionState.EMPTY))
+                || (isValidCoordinate(X, Y+1) && localFields[X][Y+1].getState().equals(IntersectionState.EMPTY))
+                || (isValidCoordinate(X, Y-1) && localFields[X][Y-1].getState().equals(IntersectionState.EMPTY))) {
             return false;
         }
 
-        if(isValidCoordinate(X+1, Y) && !fields[X+1][Y].getColor().equals(enemyColor) && !visited.contains(new Point(X+1, Y))) {
+        if(isValidCoordinate(X+1, Y) && !localFields[X+1][Y].getColor().equals(enemyColor) && !visited.contains(new Point(X+1, Y))) {
             isSurrounded = checkIfSurrounded(X+1, Y, enemyColor, surroundedStones, visited);
             if(!isSurrounded) return false;
         }
-        if(isValidCoordinate(X-1, Y) && !fields[X-1][Y].getColor().equals(enemyColor) && !visited.contains(new Point(X-1, Y))) {
+        if(isValidCoordinate(X-1, Y) && !localFields[X-1][Y].getColor().equals(enemyColor) && !visited.contains(new Point(X-1, Y))) {
             isSurrounded = checkIfSurrounded(X-1, Y, enemyColor, surroundedStones, visited);
             if(!isSurrounded) return false;
         }
-        if(isValidCoordinate(X, Y+1) && !fields[X][Y+1].getColor().equals(enemyColor) && !visited.contains(new Point(X, Y+1))) {
+        if(isValidCoordinate(X, Y+1) && !localFields[X][Y+1].getColor().equals(enemyColor) && !visited.contains(new Point(X, Y+1))) {
             isSurrounded = checkIfSurrounded(X, Y+1, enemyColor, surroundedStones, visited);
             if(!isSurrounded) return false;
         }
-        if(isValidCoordinate(X, Y-1) && !fields[X][Y-1].getColor().equals(enemyColor) && !visited.contains(new Point(X, Y-1))) {
+        if(isValidCoordinate(X, Y-1) && !localFields[X][Y-1].getColor().equals(enemyColor) && !visited.contains(new Point(X, Y-1))) {
             isSurrounded = checkIfSurrounded(X, Y-1, enemyColor, surroundedStones, visited);
             if(!isSurrounded) return false;
         }

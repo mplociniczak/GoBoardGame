@@ -1,5 +1,7 @@
 package org.server.gameLogic;
 
+import java.io.Serializable;
+
 /**
  * The Stone class represents an intersection on a Go game board and extends StoneProperties.
  * It includes methods to place, remove, and delete stones at the intersection.
@@ -45,5 +47,4 @@ public class Stone extends StoneProperties implements iStone {
         this.setColor(StoneColor.N);
         this.setState(IntersectionState.EMPTY);
     }
-
 }

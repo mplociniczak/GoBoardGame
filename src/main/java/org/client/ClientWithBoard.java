@@ -49,10 +49,8 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private JLabel pris_W;
     private JLabel scr_B;  //Score
     private JLabel scr_W;
-    private boolean passClicked = false;
     private boolean terminateGame = false;
     private final int gameOption;
-    private JButton pass;
     private final static int firstPlayer = 1;
     private final static int secondPlayer = 2;
     private final ConnectionHandler connection;
@@ -88,12 +86,13 @@ public class ClientWithBoard extends JFrame implements Runnable {
         setVisible(true);
 
         // Inicjalizacja currentGame
+        /*
         currentGame = new Game();
         currentGame.setStartTime(new Date());
 
         GameDAO gameDao = new GameDAO();
         gameDao.saveGame(currentGame); // Zapisz grę
-
+        */
         // Ustaw początkowy kolor gracza,
         currentPlayerColor = StoneColor.BLACK;
 
@@ -192,7 +191,6 @@ public class ClientWithBoard extends JFrame implements Runnable {
         scorePanel.add(pass);
 
         pass.addActionListener(e -> {
-            passClicked = true;
             connection.sendCoordinates(passCode, passCode);
         });
 
@@ -308,7 +306,6 @@ public class ClientWithBoard extends JFrame implements Runnable {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 fields[i][j].setColor(StoneColor.valueOf(receivedString[ctr++]));
-                System.out.print(fields[i][j].getColor() + " ");
             }
         }
         System.out.print("\n");
@@ -326,7 +323,6 @@ public class ClientWithBoard extends JFrame implements Runnable {
             JOptionPane.showMessageDialog(null, "Miejsce zajęte. Wybierz inne.", "Błąd ruchu", JOptionPane.ERROR_MESSAGE);
         } else if(X == passCode) {
             myTurn = false;
-            passClicked = false;
         } else if(X == endgameCode) {
             terminateGame = true;
             JOptionPane.showMessageDialog(null, "Koniec gry", "Koniec gry", JOptionPane.PLAIN_MESSAGE);
@@ -335,8 +331,11 @@ public class ClientWithBoard extends JFrame implements Runnable {
             scoreCalculator.updateScoreLabels();
 
             // Zapisywanie ruchu do bazy danych
+            /*
             saveMoveToDatabase(X, Y, color);
+            */
         }
+
     }
 
     /**
@@ -412,8 +411,9 @@ public class ClientWithBoard extends JFrame implements Runnable {
                 connection.sendCoordinates(X, Y);
 
                 // Zapisywanie ruchu do bazy danych
+                /*
                 saveMoveToDatabase(X, Y, currentPlayerColor());
-
+                */
                 myTurn = false;
             }
         }

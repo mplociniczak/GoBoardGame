@@ -54,7 +54,7 @@ public abstract class BoardBuilder {
      * @param enemyColor The color of the opponent's stones.
      * @param allyColor  The color of the player's stones.
      */
-    public abstract void searchForAdjacentEnemyStones(int X, int Y, StoneColor enemyColor, StoneColor allyColor);
+    public abstract boolean searchForAdjacentEnemyStones(int X, int Y, StoneColor enemyColor, StoneColor allyColor);
 
     /**
      * Removes stones from the board based on the specified parameters.

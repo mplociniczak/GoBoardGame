@@ -57,21 +57,32 @@ public class BotGameThread extends Thread implements Runnable, iGameThread {
     public void run() {
         try {
             Point coordinates;
+
+            int[] playersMove = new int[2];
+
             while(true) {
+
                 coordinates = (Point) firstClientInput.readObject();
 
                 if (board.buildBoard.isValidCoordinate(coordinates.x, coordinates.y) && board.buildBoard.isIntersectionEmpty(coordinates.x, coordinates.y)) {
 
-                    board.placeStone(coordinates.x, coordinates.x, StoneColor.BLACK, StoneColor.WHITE);
+                    playersMove[0] = coordinates.x;
+                    playersMove[1] = coordinates.y;
 
-                    sendMove(firstClientOutput, coordinates.x, coordinates.y);
+                    board.placeStone(playersMove, StoneColor.BLACK, StoneColor.WHITE);
+
+                    sendMove(firstClientOutput, playersMove[0], playersMove[1]);
 
                 } else if (coordinates.x == passCode) {
+
                     sendMove(firstClientOutput, endgameCode, endgameCode);
 
-                    this.interrupt();
+                    break;
+
                 } else {
+
                     sendMove(firstClientOutput, errorCode, errorCode);
+
                 }
 
                 coordinates = bot.makeMove();
@@ -81,5 +92,7 @@ public class BotGameThread extends Thread implements Runnable, iGameThread {
         } catch(IOException | ClassNotFoundException ex) {
             ex.getMessage();
         }
+
+        this.interrupt();
     }
 }

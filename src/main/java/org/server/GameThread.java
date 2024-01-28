@@ -20,8 +20,7 @@ public class GameThread extends Thread implements Runnable, iGameThread {
     ObjectInputStream secondClientInput;
     private Board board;
     private int passCounter = 0;
-
-    private GameDAO gameDao = new GameDAO();
+    private GameDAO gameDao;
     private Game currentGame;
 
     public GameThread(ObjectInputStream firstClientInput, ObjectOutputStream firstClientOutput, ObjectInputStream secondClientInput, ObjectOutputStream secondClientOutput) {
@@ -30,6 +29,7 @@ public class GameThread extends Thread implements Runnable, iGameThread {
         this.firstClientInput = firstClientInput;
         this.secondClientInput = secondClientInput;
         board = new Board();
+        gameDao = new GameDAO();
     }
 
     public void sendMove(ObjectOutputStream out, int X, int Y) throws IOException {
@@ -39,6 +39,7 @@ public class GameThread extends Thread implements Runnable, iGameThread {
     }
 
     Point coordinates = new Point();
+    int[] playersMove = new int[2];
     private void handleUserInputAndSendBackCoordinates(ObjectInputStream clientInput, StoneColor color) throws IOException, ClassNotFoundException {
 
         coordinates = (Point) clientInput.readObject();
@@ -57,11 +58,14 @@ public class GameThread extends Thread implements Runnable, iGameThread {
 
         } else if (board.buildBoard.isIntersectionEmpty(coordinates.x, coordinates.y)) {
 
-            board.placeStone(coordinates.x, coordinates.y, color, enemyColor);
+            playersMove[0] = coordinates.x;
+            playersMove[1] = coordinates.y;;
 
-            sendMove(secondClientOutput, coordinates.x, coordinates.y);
+            board.placeStone(playersMove, color, enemyColor);
 
-            sendMove(firstClientOutput, coordinates.x, coordinates.y);
+            sendMove(secondClientOutput, playersMove[0], playersMove[1]);
+
+            sendMove(firstClientOutput, playersMove[0], playersMove[1]);
 
             passCounter = 0;
 
@@ -81,10 +85,11 @@ public class GameThread extends Thread implements Runnable, iGameThread {
         System.out.println("Running...");
 
         // zapisywanie do bazy przy rozpoczęciu gry
+        /*
         currentGame = new Game();
         currentGame.setStartTime(new Date());
         gameDao.saveGame(currentGame);
-
+        */
         try{
             firstClientOutput.writeInt(first);
             firstClientOutput.flush();
@@ -101,7 +106,7 @@ public class GameThread extends Thread implements Runnable, iGameThread {
                         Server.removeGame(this);
                         sendMove(firstClientOutput, endgameCode, endgameCode);
                         sendMove(secondClientOutput, endgameCode, endgameCode);
-                        this.interrupt();
+                        break;
                     }
 
                     turn = second;
@@ -115,7 +120,7 @@ public class GameThread extends Thread implements Runnable, iGameThread {
                         removeGame(this);
                         sendMove(firstClientOutput, endgameCode, endgameCode);
                         sendMove(secondClientOutput, endgameCode, endgameCode);
-                        this.interrupt();
+                        break;
                     }
 
                     turn = first;
@@ -126,7 +131,10 @@ public class GameThread extends Thread implements Runnable, iGameThread {
         }
 
         // Przy zakończeniu gry
+        /*
         currentGame.setEndTime(new Date());
         gameDao.updateGame(currentGame);
+        */
+        this.interrupt();
     }
 }

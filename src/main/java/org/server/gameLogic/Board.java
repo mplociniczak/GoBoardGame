@@ -77,8 +77,17 @@ public class Board {
 
         if(!buildBoard.isStoneBreathing(X, Y) || buildBoard.isKoViolation()) {
             fields[X][Y].deleteStone();
-            X = Server.errorCode;
-            Y = Server.errorCode;
+        }
+    }
+    boolean isMoveValid;
+    public void placeStone(int[] coordinates, StoneColor color, StoneColor enemyColor) {
+        //fields[coordinates[0]][coordinates[1]].placeStone(color);
+
+        isMoveValid = buildBoard.searchForAdjacentEnemyStones(coordinates[0], coordinates[1], enemyColor, color);
+
+        if(!isMoveValid || !buildBoard.isStoneBreathing(coordinates[0], coordinates[1])) {
+            coordinates[0] = Server.errorCode;
+            coordinates[1] = Server.errorCode;
         }
     }
 }
