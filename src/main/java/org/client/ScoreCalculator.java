@@ -12,22 +12,24 @@ import java.util.Set;
 import static org.server.gameLogic.Board.size;
 
 class ScoreCalculator {
-    private Stone[][] fields;
+    //private Stone[][] fields;
     private JLabel ter_B;
     private JLabel ter_W;
     private JLabel pris_B;
     private JLabel pris_W;
     private JLabel scr_B;
     private JLabel scr_W;
+    FloodFill ff;
 
     public ScoreCalculator(Stone[][] fields, JLabel ter_B, JLabel ter_W, JLabel pris_B, JLabel pris_W, JLabel scr_B, JLabel scr_W) {
-        this.fields = fields;
+        //this.fields = fields;
         this.ter_B = ter_B;
         this.ter_W = ter_W;
         this.pris_B = pris_B;
         this.pris_W = pris_W;
         this.scr_B = scr_B;
         this.scr_W = scr_W;
+        ff = new FloodFill(fields);
     }
 
     public void updateScoreLabels() {
@@ -36,13 +38,15 @@ class ScoreCalculator {
             int blackTerritory = calculateTerritory(StoneColor.BLACK, StoneColor.WHITE);
             int whiteTerritory = calculateTerritory(StoneColor.WHITE, StoneColor.BLACK);
 
-            Set<Point> deadStonesBlack = identifyDeadStones(StoneColor.BLACK);
-            Set<Point> deadStonesWhite = identifyDeadStones(StoneColor.WHITE);
+            //Set<Point> deadStonesBlack = identifyDeadStones(StoneColor.BLACK);
+            //Set<Point> deadStonesWhite = identifyDeadStones(StoneColor.WHITE);
 
-            int damePoints = countNeutralPoints();
+            //int damePoints = countNeutralPoints();
 
-            int blackScore = blackTerritory - deadStonesBlack.size() + damePoints;
-            int whiteScore = whiteTerritory - deadStonesWhite.size() + damePoints;
+            int blackScore = 100;
+            int whiteScore = 100;
+            //int blackScore = blackTerritory - deadStonesBlack.size() + damePoints;
+            //int whiteScore = whiteTerritory - deadStonesWhite.size() + damePoints;
 
             //int blackPrisoners = countPrisoners(StoneColor.BLACK);
             //int whitePrisoners = countPrisoners(StoneColor.WHITE);
@@ -59,24 +63,28 @@ class ScoreCalculator {
             scr_W.setText(String.valueOf(whiteScore));
         });
     }
-
     private int calculateTerritory(StoneColor color, StoneColor enemyColor) {
         int territoryCount = 0;
-        boolean[][] visited = new boolean[size][size];
+        //boolean[][] visited = new boolean[size][size];
+
+        Set<Point> visited = new HashSet<>();
 
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
-                if (!visited[i][j] && fields[i][j].getState().equals(IntersectionState.EMPTY)) {
-                    Set<Point> territory = new HashSet<>();
+                    //Set<Point> territory = new HashSet<>();
+                    //ff.floodFill(territory, visited, i, j, enemyColor);
+                    /*
                     if (isTerritory(i, j, color, enemyColor, visited, territory)) {
                         territoryCount += territory.size();
                     }
-                }
+                    */
+                    //territoryCount += territory.size();
             }
         }
+        System.out.println("Enemy points: " + territoryCount + " " + enemyColor);
         return territoryCount;
     }
-
+    /*
     private boolean isTerritory(int x, int y, StoneColor color, StoneColor enemyColor, boolean[][] visited, Set<Point> territory) {
         if (x < 0 || x >= size || y < 0 || y >= size) return true;
         if (visited[x][y]) return true;
@@ -170,7 +178,7 @@ class ScoreCalculator {
 
         return nextToBlack && nextToWhite;
     }
-
+*/
 
 
 

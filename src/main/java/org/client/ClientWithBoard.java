@@ -190,9 +190,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
         scorePanel.add(pass);
 
-        pass.addActionListener(e -> {
-            connection.sendCoordinates(passCode, passCode);
-        });
+        pass.addActionListener(e -> connection.sendCoordinates(passCode, passCode));
 
         JButton replayButton = new JButton("Replay Game");
         replayButton.addActionListener(e -> replayGame());
