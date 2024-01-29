@@ -80,9 +80,7 @@ public class ConnectionHandler {
      */
     public int receiveTurn() {
         try{
-            int turn = input.readInt();
-            System.out.println(turn);
-            return turn;
+            return input.readInt();
         } catch (IOException ex) {
             ex.getMessage();
         }

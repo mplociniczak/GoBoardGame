@@ -10,7 +10,7 @@ import java.util.Date;
 
 import static org.server.Server.*;
 
-public class GameThread extends Thread implements Runnable, iGameThread {
+public class GameThread implements Runnable, iGameThread {
     private final static int first = 1;
     private final static int second = 2;
     private static int turn = first;
@@ -33,7 +33,6 @@ public class GameThread extends Thread implements Runnable, iGameThread {
     }
 
     public void sendMove(ObjectOutputStream out, int X, int Y) throws IOException {
-        System.out.println(board.BoardToStringBuilderWithStoneColors(X, Y));
         out.writeObject(board.BoardToStringBuilderWithStoneColors(X, Y));
         out.flush();
     }
@@ -71,9 +70,9 @@ public class GameThread extends Thread implements Runnable, iGameThread {
 
         } else {
 
-            sendMove(firstClientOutput, errorCode, errorCode);
-
             sendMove(secondClientOutput, errorCode, errorCode);
+
+            sendMove(firstClientOutput, errorCode, errorCode);
 
             passCounter = 0;
         }
@@ -81,7 +80,8 @@ public class GameThread extends Thread implements Runnable, iGameThread {
     @Override
     public void run() {
 
-        addGame(this);
+        boolean endGame = false;
+
         System.out.println("Running...");
 
         // zapisywanie do bazy przy rozpoczęciu gry
@@ -97,16 +97,15 @@ public class GameThread extends Thread implements Runnable, iGameThread {
             secondClientOutput.writeInt(second);
             secondClientOutput.flush();
 
-            while (true) {
+            while (!endGame) {
                 if (turn == first) {
 
                     handleUserInputAndSendBackCoordinates(firstClientInput, StoneColor.BLACK);
 
                     if(passCounter == 2) {
-                        Server.removeGame(this);
-                        sendMove(firstClientOutput, endgameCode, endgameCode);
                         sendMove(secondClientOutput, endgameCode, endgameCode);
-                        break;
+                        sendMove(firstClientOutput, endgameCode, endgameCode);
+                        endGame = true;
                     }
 
                     turn = second;
@@ -117,15 +116,18 @@ public class GameThread extends Thread implements Runnable, iGameThread {
                     handleUserInputAndSendBackCoordinates(secondClientInput, StoneColor.WHITE);
 
                     if(passCounter == 2) {
-                        removeGame(this);
-                        sendMove(firstClientOutput, endgameCode, endgameCode);
                         sendMove(secondClientOutput, endgameCode, endgameCode);
-                        break;
+                        sendMove(firstClientOutput, endgameCode, endgameCode);
+                        endGame = true;
                     }
 
                     turn = first;
                 }
+
             }
+
+            System.out.println("Game ended");
+
         } catch (IOException | ClassNotFoundException ex) {
             //TODO: handle
         }
@@ -135,6 +137,5 @@ public class GameThread extends Thread implements Runnable, iGameThread {
         currentGame.setEndTime(new Date());
         gameDao.updateGame(currentGame);
         */
-        this.interrupt();
     }
 }

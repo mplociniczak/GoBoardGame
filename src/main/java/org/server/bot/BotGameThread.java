@@ -16,7 +16,7 @@ import static org.server.Server.*;
  * The BotGameThread class represents a thread for a game against a bot.
  * It handles communication with the first client and orchestrates the game moves against the SmartBot.
  */
-public class BotGameThread extends Thread implements Runnable, iGameThread {
+public class BotGameThread implements Runnable, iGameThread {
     ObjectInputStream firstClientInput;
     ObjectOutputStream firstClientOutput;
     private Board board;
@@ -86,13 +86,12 @@ public class BotGameThread extends Thread implements Runnable, iGameThread {
                 }
 
                 coordinates = bot.makeMove();
+                board.placeStone(coordinates.x, coordinates.y, StoneColor.WHITE, StoneColor.BLACK);
                 sendMove(firstClientOutput, coordinates.x , coordinates.y);
 
             }
         } catch(IOException | ClassNotFoundException ex) {
             ex.getMessage();
         }
-
-        this.interrupt();
     }
 }

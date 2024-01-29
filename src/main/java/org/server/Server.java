@@ -79,9 +79,8 @@ public class Server {
 
                     BotGameThread currentBotGame = new BotGameThread(client.clientInput, client.clientOutput);
 
-                    currentBotGame.start();
+                    new Thread(currentBotGame).start();
 
-                    allCurrentGames.add(currentBotGame);
 
                 } else if(mode == 0) {
                     waitingClients.add(client);
@@ -92,8 +91,7 @@ public class Server {
                     GameThread currentGame = new GameThread(waitingClients.get(0).clientInput, waitingClients.get(0).clientOutput,
                             waitingClients.get(1).clientInput, waitingClients.get(1).clientOutput);
 
-                    //new Thread(currentGame).start();
-                    currentGame.start();
+                    new Thread(currentGame).start();
 
                     waitingClients.clear();
                 }

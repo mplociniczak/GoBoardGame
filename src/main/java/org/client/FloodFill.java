@@ -5,35 +5,73 @@ import org.server.gameLogic.Stone;
 import org.server.gameLogic.StoneColor;
 
 import java.awt.*;
+import java.util.HashSet;
 import java.util.Set;
+
+import static org.server.gameLogic.Board.size;
 
 public class FloodFill {
     Stone[][] fields;
-
     public FloodFill(Stone[][] fields) {
         this.fields = fields;
     }
-    private void floodFillHelper(Set<Point> score, Set<Point> visited, int x, int y, StoneColor enemyColor){
+    public int calculateTerritory(StoneColor color, StoneColor enemyColor) {
+        int territoryCount = 0;
+        Set<Point> surrounded = new HashSet<>();
+        Set<Point> visited = new HashSet<>();
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
 
-        if(!fields[x][y].getColor().equals(enemyColor)) {
+                if (fields[i][j].getState().equals(IntersectionState.EMPTY) && !visited.contains(new Point(i, j))) {
 
-            visited.add(new Point(x, y));
+                    canBeSurrounded = true;
 
-            score.add(new Point(x, y));
+                    checkIfSurrounded(i, j, surrounded, visited, enemyColor, color);
 
-            if(x >= 1) floodFillHelper(score, visited,x - 1, y, enemyColor);
+                    visited.clear();
 
-            if(y >= 1) floodFillHelper(score, visited, x, y - 1, enemyColor);
+                    territoryCount += surrounded.size();
 
-            if(x + 1 < fields.length) floodFillHelper(score, visited, x + 1, y, enemyColor);
-
-            if(y + 1 < fields[0].length) floodFillHelper(score, visited, x, y + 1, enemyColor);
+                }
+            }
         }
+
+        return territoryCount - 1;
+    }
+    public boolean isValidCoordinate(int x, int y) {
+        return x >= 0 && x < size && y >= 0 && y < size;
     }
 
-    public void floodFill(Set<Point> score, Set<Point> visited, int x, int y, StoneColor enemyColor){
-        if(fields[x][y].getState().equals(IntersectionState.EMPTY) && !visited.contains(new Point(x, y))) {
-            floodFillHelper(score, visited, x, y, enemyColor);
+    boolean canBeSurrounded = true;
+    private void checkIfSurrounded(int X, int Y, Set<Point> surrounded, Set<Point> visited, StoneColor enemyColor, StoneColor color) {
+
+        if(!isValidCoordinate(X, Y) || !canBeSurrounded) return;
+
+        if(fields[X][Y].getColor().equals(color)) return;
+
+        if(fields[X][Y].getColor().equals(enemyColor)) {
+            canBeSurrounded = false;
+            return;
         }
+
+        visited.add(new Point(X, Y));
+
+        if(!visited.contains(new Point(X+1, Y)))
+            checkIfSurrounded(X+1, Y, surrounded, visited, enemyColor, color);
+
+        if(!visited.contains(new Point(X-1, Y)))
+            checkIfSurrounded(X-1, Y, surrounded, visited, enemyColor, color);
+
+        if(!visited.contains(new Point(X, Y+1)))
+            checkIfSurrounded(X, Y+1, surrounded, visited, enemyColor, color);
+
+        if(!visited.contains(new Point(X, Y-1)))
+            checkIfSurrounded(X, Y-1, surrounded, visited, enemyColor, color);
+
+        if(fields[X][Y].getState().equals(IntersectionState.EMPTY) && canBeSurrounded) {
+            surrounded.add(new Point(X, Y));
+        }
+
+        if(!canBeSurrounded) surrounded.clear();
     }
 }

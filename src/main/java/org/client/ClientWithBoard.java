@@ -290,7 +290,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private void receiveCoordinatesAndPlaceStone(StoneColor color){
         StringBuilder receivedCoordinates = connection.receiveCoordinates();
 
-        System.out.println(receivedCoordinates);
+        //System.out.println(receivedCoordinates);
 
         String[] receivedString = receivedCoordinates.toString().split(" ");
 
@@ -306,7 +306,6 @@ public class ClientWithBoard extends JFrame implements Runnable {
                 fields[i][j].setColor(StoneColor.valueOf(receivedString[ctr++]));
             }
         }
-        System.out.print("\n");
 
         // Zmiana aktualnego koloru gracza na przeciwny po wykonanym ruchu
         if (color == StoneColor.BLACK) {
@@ -323,10 +322,10 @@ public class ClientWithBoard extends JFrame implements Runnable {
             myTurn = false;
         } else if(X == endgameCode) {
             terminateGame = true;
+            scoreCalculator.updateScoreLabels();
             JOptionPane.showMessageDialog(null, "Koniec gry", "Koniec gry", JOptionPane.PLAIN_MESSAGE);
         } else {
             updateStoneGraphics(X, Y, color);
-            scoreCalculator.updateScoreLabels();
 
             // Zapisywanie ruchu do bazy danych
             /*
@@ -352,25 +351,26 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
             while (true) {
                 if (player == firstPlayer) {
-
-                    if(terminateGame) break;
                     //first player's move confirmation
                     receiveCoordinatesAndPlaceStone(StoneColor.BLACK);
+                    if(terminateGame) break;
 
                     //second player's move
                     receiveCoordinatesAndPlaceStone(StoneColor.WHITE);
+                    if(terminateGame) break;
 
                     myTurn = true;
 
                 } else if (player == secondPlayer) {
                     //first player's move confirmation
                     receiveCoordinatesAndPlaceStone(StoneColor.BLACK);
+                    if(terminateGame) break;
 
                     myTurn = true;
 
-                    if(terminateGame) break;
                     //second player's move
                     receiveCoordinatesAndPlaceStone(StoneColor.WHITE);
+                    if(terminateGame) break;
 
                 }
             }
@@ -380,8 +380,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
         else if(gameOption == 1) {
             myTurn = true;
 
-            while(true) {
-                if(terminateGame) break;
+            while(!terminateGame) {
 
                 receiveCoordinatesAndPlaceStone(StoneColor.BLACK);
 
