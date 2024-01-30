@@ -17,6 +17,25 @@ public class Game {
     @Column(name = "end_time")
     private Date endTime;
 
+    // Statyczna instancja klasy Game
+    private static Game instance;
+
+    // Prywatny konstruktor klasy Game
+    /*
+    private Game() {
+
+    }
+
+     */
+
+    // Publiczna metoda do uzyskania dostępu do instancji klasy Game
+    public static Game getInstance() {
+        if (instance == null) {
+            instance = new Game();
+        }
+        return instance;
+    }
+
     // Konstruktory, gettery i settery
     public Date getStartTime() {
         return startTime;
