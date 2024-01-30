@@ -140,6 +140,9 @@ public class ReplayGameWindow extends JFrame implements Runnable {
                 Move move = moves.get(i);
                 draw.updateStoneGraphics(move.getPositionX(), move.getPositionY(), move.getStoneColor(), gameBoardPanel);
             }
+        } else {
+            // Wyświetl komunikat, gdy nie ma więcej ruchów do odtworzenia
+            JOptionPane.showMessageDialog(this, "Wszystkie ruchy zostały cofnięte. Nie ma więcej ruchów do wyświetlenia.", "Koniec ruchów", JOptionPane.INFORMATION_MESSAGE);
         }
     }
 
