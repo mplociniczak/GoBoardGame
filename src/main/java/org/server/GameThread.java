@@ -22,6 +22,7 @@ public class GameThread implements Runnable, iGameThread {
     private int passCounter = 0;
     private GameDAO gameDao;
     private Game currentGame;
+    private boolean endGame = false;
 
     public GameThread(ObjectInputStream firstClientInput, ObjectOutputStream firstClientOutput, ObjectInputStream secondClientInput, ObjectOutputStream secondClientOutput) {
         this.firstClientOutput = firstClientOutput;
@@ -55,13 +56,23 @@ public class GameThread implements Runnable, iGameThread {
         coordinates = (Point) clientInput.readObject();
 
         //TODO: test it
-        saveMoveToDatabase(coordinates.x, coordinates.y, color);
+        //saveMoveToDatabase(coordinates.x, coordinates.y, color);
 
         StoneColor enemyColor = (color == StoneColor.BLACK) ? StoneColor.WHITE : StoneColor.BLACK;
 
         board.buildBoard.setStoneRemovedFlagToFalse();
 
-        if(coordinates.x == passCode) {
+        if(coordinates.x == endgameCode) {
+
+            int playerWon = color.equals(StoneColor.BLACK) ? second : first;
+
+            sendMove(secondClientOutput, endgameCode, playerWon);
+
+            sendMove(firstClientOutput, endgameCode, playerWon);
+
+            endGame = true;
+
+        } else if(coordinates.x == passCode) {
 
             sendMove(secondClientOutput, passCode, passCode);
 
@@ -91,10 +102,16 @@ public class GameThread implements Runnable, iGameThread {
             passCounter = 0;
         }
     }
+
+    void checkIfTwoPlayersPassed() throws IOException {
+        if(passCounter == 2) {
+            sendMove(secondClientOutput, endgameCode, endgameCode);
+            sendMove(firstClientOutput, endgameCode, endgameCode);
+            endGame = true;
+        }
+    }
     @Override
     public void run() {
-
-        boolean endGame = false;
 
         System.out.println("Running...");
 
@@ -111,16 +128,14 @@ public class GameThread implements Runnable, iGameThread {
             secondClientOutput.writeInt(second);
             secondClientOutput.flush();
 
-            while (!endGame) {
+            while (true) {
                 if (turn == first) {
 
                     handleUserInputAndSendBackCoordinates(firstClientInput, StoneColor.BLACK);
 
-                    if(passCounter == 2) {
-                        sendMove(secondClientOutput, endgameCode, endgameCode);
-                        sendMove(firstClientOutput, endgameCode, endgameCode);
-                        endGame = true;
-                    }
+                    checkIfTwoPlayersPassed();
+
+                    if(endGame) break;
 
                     turn = second;
                 }
@@ -129,11 +144,9 @@ public class GameThread implements Runnable, iGameThread {
 
                     handleUserInputAndSendBackCoordinates(secondClientInput, StoneColor.WHITE);
 
-                    if(passCounter == 2) {
-                        sendMove(secondClientOutput, endgameCode, endgameCode);
-                        sendMove(firstClientOutput, endgameCode, endgameCode);
-                        endGame = true;
-                    }
+                    checkIfTwoPlayersPassed();
+
+                    if(endGame) break;
 
                     turn = first;
                 }

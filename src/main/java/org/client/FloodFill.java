@@ -23,11 +23,13 @@ public class FloodFill {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
 
+                canBeSurrounded = true;
+
                 if (fields[i][j].getState().equals(IntersectionState.EMPTY) && !globalVisited.contains(new Point(i, j))) {
 
-                    canBeSurrounded = true;
-
                     checkIfSurrounded(i, j, surrounded, visited, globalVisited, enemyColor, color);
+
+                    if(!canBeSurrounded) surrounded.clear();
 
                     visited.clear();
 
@@ -37,7 +39,7 @@ public class FloodFill {
             }
         }
 
-        return territoryCount - 1;
+        return territoryCount;
     }
     public boolean isValidCoordinate(int x, int y) {
         return x >= 0 && x < size && y >= 0 && y < size;
@@ -73,7 +75,5 @@ public class FloodFill {
         if(fields[X][Y].getState().equals(IntersectionState.EMPTY) && canBeSurrounded) {
             surrounded.add(new Point(X, Y));
         }
-
-        if(!canBeSurrounded) surrounded.clear();
     }
 }

@@ -45,7 +45,6 @@ public class BotGameThread implements Runnable, iGameThread {
      * @throws IOException If an I/O error occurs during the output operation.
      */
     public void sendMove(ObjectOutputStream out, int X, int Y) throws IOException {
-        System.out.println(board.BoardToStringBuilderWithStoneColors(X, Y));
         out.writeObject(board.BoardToStringBuilderWithStoneColors(X, Y));
         out.flush();
     }

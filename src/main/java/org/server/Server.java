@@ -81,7 +81,6 @@ public class Server {
 
                     new Thread(currentBotGame).start();
 
-
                 } else if(mode == 0) {
                     waitingClients.add(client);
                 }

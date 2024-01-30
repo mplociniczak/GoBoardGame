@@ -59,6 +59,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private ScoreCalculator scoreCalculator; // Add ScoreCalculator instance
     private StoneColor currentPlayerColor;
     private Game currentGame;
+    private int playerWon;
 
     /**
      * Constructs a new {@code ClientWithBoard} with the specified game option.
@@ -160,6 +161,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
         scr_B = new JLabel();
         scr_W = new JLabel();
         JButton pass = new JButton("Pass");
+        JButton resign = new JButton("Resign");
 
         JPanel scorePanel = new JPanel();
         scorePanel.setLayout(new GridLayout(5, 3)); // Two columns
@@ -191,6 +193,10 @@ public class ClientWithBoard extends JFrame implements Runnable {
         scorePanel.add(pass);
 
         pass.addActionListener(e -> connection.sendCoordinates(passCode, passCode));
+
+        scorePanel.add(resign);
+
+        resign.addActionListener(e -> connection.sendCoordinates(endgameCode, endgameCode));
 
         JButton replayButton = new JButton("Replay Game");
         replayButton.addActionListener(e -> replayGame());
@@ -316,15 +322,34 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
         //Incorrect move
         if(X == errorCode) {
+
             System.out.println("Incorrect move!");
+
             JOptionPane.showMessageDialog(null, "Miejsce zajęte. Wybierz inne.", "Błąd ruchu", JOptionPane.ERROR_MESSAGE);
+
         } else if(X == passCode) {
+
             myTurn = false;
+
         } else if(X == endgameCode) {
+
             terminateGame = true;
             scoreCalculator.updateScoreLabels();
-            JOptionPane.showMessageDialog(null, "Koniec gry", "Koniec gry", JOptionPane.PLAIN_MESSAGE);
+
+            if(Y != endgameCode) {
+
+                playerWon = Y;
+
+                JOptionPane.showMessageDialog(null, "Koniec gry. Wygrał " + playerWon, "Koniec gry", JOptionPane.PLAIN_MESSAGE);
+
+            } else {
+
+                JOptionPane.showMessageDialog(null, "Koniec gry", "Koniec gry", JOptionPane.PLAIN_MESSAGE);
+
+            }
+
         } else {
+
             updateStoneGraphics(X, Y, color);
 
             // Zapisywanie ruchu do bazy danych
