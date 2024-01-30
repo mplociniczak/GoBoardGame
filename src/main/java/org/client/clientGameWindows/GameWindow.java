@@ -1,11 +1,8 @@
-package org.client;
+package org.client.clientGameWindows;
 
-import org.server.*;
-import org.server.database.Game;
-import org.server.database.GameDAO;
-import org.server.database.Move;
-import org.server.database.MoveDAO;
-import org.server.gameLogic.Board;
+import org.client.ConnectionHandler;
+import org.client.calculatePoints.ScoreCalculator;
+import org.constants.ConstantVariables;
 import org.server.gameLogic.Stone;
 import org.server.gameLogic.StoneColor;
 
@@ -15,10 +12,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.Date;
 
-import static org.server.Server.*;
-import static org.server.gameLogic.Board.*;
 
 /**
  * The {@code ClientWithBoard} class represents the client-side of a Go game with a graphical user interface.
@@ -41,7 +35,7 @@ import static org.server.gameLogic.Board.*;
  * @author MP, RR
  * @version 1.0
  */
-public class ClientWithBoard extends JFrame implements Runnable {
+public class GameWindow extends JFrame implements Runnable, ConstantVariables {
     private static JPanel gameBoardPanel;
     private JLabel ter_B;  //Territory
     private JLabel ter_W;
@@ -57,16 +51,15 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private boolean myTurn;
     private static Stone[][] fields;
     private ScoreCalculator scoreCalculator; // Add ScoreCalculator instance
-    private StoneColor currentPlayerColor;
-    private Game currentGame;
-    private int playerWon;
+    private Utils draw;
+    //private StoneColor currentPlayerColor;
 
     /**
-     * Constructs a new {@code ClientWithBoard} with the specified game option.
+     * Constructs a new {@code GameWindow} with the specified game option.
      *
      * @param gameOption The game option: 0 for a two-player game, 1 for a game against a bot.
      */
-    public ClientWithBoard(int gameOption) {
+    public GameWindow(int gameOption) {
 
         setTitle("Go Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -84,25 +77,16 @@ public class ClientWithBoard extends JFrame implements Runnable {
         }
 
         createUI();
+
+        setResizable(false);
+
         setVisible(true);
 
-        // Inicjalizacja currentGame
-        /*
-        currentGame = new Game();
-        currentGame.setStartTime(new Date());
-
-        GameDAO gameDao = new GameDAO();
-        gameDao.saveGame(currentGame); // Zapisz grę
-        */
-        // Ustaw początkowy kolor gracza,
-        currentPlayerColor = StoneColor.BLACK;
+        //currentPlayerColor = StoneColor.BLACK;
 
         scoreCalculator = new ScoreCalculator(fields, ter_B, ter_W, pris_B, pris_W, scr_B, scr_W);
 
-    }
-
-    public StoneColor currentPlayerColor() {
-        return currentPlayerColor;
+        draw = new DrawingUtils();
     }
 
     /**
@@ -140,12 +124,6 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
                 square.setBackground(Color.ORANGE);
 
-                /* Zmiana koloru co drugiego pola
-                if ((i + j) % 2 == 0) {
-                    square.setBackground(Color.ORANGE);
-                }
-
-                 */
                 square.setPreferredSize(new Dimension(25, 25));
 
                 gameBoardPanel.add(square);
@@ -192,15 +170,29 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
         scorePanel.add(pass);
 
-        pass.addActionListener(e -> connection.sendCoordinates(passCode, passCode));
+        pass.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(myTurn) {
+                    connection.sendCoordinates(passCode, passCode);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Not your turn", null, JOptionPane.PLAIN_MESSAGE);
+                }
+            }
+        });
 
         scorePanel.add(resign);
 
-        resign.addActionListener(e -> connection.sendCoordinates(endgameCode, endgameCode));
-
-        JButton replayButton = new JButton("Replay Game");
-        replayButton.addActionListener(e -> replayGame());
-        scorePanel.add(replayButton);
+        resign.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(myTurn) {
+                    connection.sendCoordinates(endgameCode, endgameCode);
+                } else {
+                    JOptionPane.showMessageDialog(null, "Not your turn", null, JOptionPane.PLAIN_MESSAGE);
+                }
+            }
+        });
 
         splitPane.add(scorePanel);
 
@@ -224,47 +216,6 @@ public class ClientWithBoard extends JFrame implements Runnable {
         int Y = Math.max(0, Math.min(y / tileSizeY, size - 1));
 
         return new Point(X, Y);
-    }
-
-
-    /**
-     * Updates the graphical representation of a stone on the game board.
-     *
-     * @param X     The x-coordinate of the stone on the board.
-     * @param Y     The y-coordinate of the stone on the board.
-     * @param color The color of the stone.
-     */
-    private void updateStoneGraphics(int X, int Y, StoneColor color) {
-        // Pobierz centralny kwadrat, który znajduje się na przecięciu czterech sąsiadujących kwadratów
-        JPanel centralSquare = (JPanel) gameBoardPanel.getComponent(Y * size + X);
-
-        // Usunięcie wcześniejszych komponentów z centralnego kwadratu
-        centralSquare.removeAll();
-        //squareToPaintRockOn.removeAll();
-
-        // Oblicz położenie do narysowania koła na środku przecięcia
-        int tileSize = gameBoardPanel.getWidth() / size;
-        int centerX = X * tileSize + tileSize / 2;
-        int centerY = Y * tileSize + tileSize / 2;
-
-        // Dodanie nowego komponentu reprezentującego kamień jako okrąg na środku przecięcia
-        StoneComponent stoneComponent = new StoneComponent(color);
-        int componentSize = stoneComponent.getPreferredSize().width;
-
-        // Ustawienie rozmiaru kamienia
-        stoneComponent.setSize(componentSize, componentSize);
-
-        // Ustawienie pozycji kamienia na środku przecięcia
-        int componentX = centerX - componentSize / 2;
-        int componentY = centerY - componentSize / 2;
-
-        stoneComponent.setBounds(componentX, componentY, componentSize, componentSize);
-        centralSquare.add(stoneComponent);
-
-        centralSquare.revalidate();
-        centralSquare.repaint();
-
-        removeStoneFromBoard();
     }
 
 
@@ -296,8 +247,6 @@ public class ClientWithBoard extends JFrame implements Runnable {
     private void receiveCoordinatesAndPlaceStone(StoneColor color){
         StringBuilder receivedCoordinates = connection.receiveCoordinates();
 
-        //System.out.println(receivedCoordinates);
-
         String[] receivedString = receivedCoordinates.toString().split(" ");
 
         int X = Integer.parseInt(receivedString[0]);
@@ -314,11 +263,11 @@ public class ClientWithBoard extends JFrame implements Runnable {
         }
 
         // Zmiana aktualnego koloru gracza na przeciwny po wykonanym ruchu
-        if (color == StoneColor.BLACK) {
-            currentPlayerColor = StoneColor.WHITE;
-        } else {
-            currentPlayerColor = StoneColor.BLACK;
-        }
+//        if (color == StoneColor.BLACK) {
+//            currentPlayerColor = StoneColor.WHITE;
+//        } else {
+//            currentPlayerColor = StoneColor.BLACK;
+//        }
 
         //Incorrect move
         if(X == errorCode) {
@@ -338,9 +287,7 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
             if(Y != endgameCode) {
 
-                playerWon = Y;
-
-                JOptionPane.showMessageDialog(null, "Koniec gry. Wygrał " + playerWon, "Koniec gry", JOptionPane.PLAIN_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Koniec gry. Wygrał " + Y, "Koniec gry", JOptionPane.PLAIN_MESSAGE);
 
             } else {
 
@@ -350,12 +297,10 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
         } else {
 
-            updateStoneGraphics(X, Y, color);
+            draw.updateStoneGraphics(X, Y, color, gameBoardPanel);
 
-            // Zapisywanie ruchu do bazy danych
-            /*
-            saveMoveToDatabase(X, Y, color);
-            */
+            removeStoneFromBoard();
+
         }
 
     }
@@ -432,19 +377,8 @@ public class ClientWithBoard extends JFrame implements Runnable {
 
                 connection.sendCoordinates(X, Y);
 
-                // Zapisywanie ruchu do bazy danych
-                /*
-                saveMoveToDatabase(X, Y, currentPlayerColor());
-                */
                 myTurn = false;
             }
         }
-    }
-
-    /**
-     * Initiates the replay of the game.
-     */
-    private void replayGame() {
-        // TODO
     }
 }

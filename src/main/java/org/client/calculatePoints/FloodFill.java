@@ -1,4 +1,4 @@
-package org.client;
+package org.client.calculatePoints;
 
 import org.server.gameLogic.IntersectionState;
 import org.server.gameLogic.Stone;

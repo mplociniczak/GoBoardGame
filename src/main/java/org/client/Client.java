@@ -1,17 +1,17 @@
 package org.client;
 
+import org.client.clientGameWindows.GameWindow;
+import org.client.clientGameWindows.ReplayGameWindow;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 /**
- * Doesn't communicate with server - check what can we improve
+ * Starting window with 3 buttons to choose what you want to do
  */
 public class Client extends JFrame {
-    private JButton playWithBot;
-    private JButton joinGameButton;
-    private JButton startGameButton;
 
     public Client() {
         setTitle("Go Game");
@@ -26,24 +26,25 @@ public class Client extends JFrame {
         JPanel mainPanel = new JPanel();
         mainPanel.setLayout(new GridLayout(3, 1));
 
-        playWithBot = new JButton("Play with bot");
-        joinGameButton = new JButton("Join Game");
-        startGameButton = new JButton("Start Game");
+        JButton playWithBot = new JButton("Play with bot");
+        JButton replayGame = new JButton("Replay Game");
+        JButton startGameButton = new JButton("Start Game");
 
         playWithBot.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Implement the logic for playing with bot
-                Thread t = new Thread(new ClientWithBoard(1));
+                Thread t = new Thread(new GameWindow(1));
                 t.start();
             }
         });
 
-        joinGameButton.addActionListener(new ActionListener() {
+        replayGame.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Implement the logic for joining a game
-                JOptionPane.showMessageDialog(null, "Joining the game...");
+                // Implement the logic for replaying a game
+                Thread t = new Thread(new ReplayGameWindow());
+                t.start();
             }
         });
 
@@ -51,13 +52,13 @@ public class Client extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Implement the logic for starting a game
-                Thread t = new Thread(new ClientWithBoard(0));
+                Thread t = new Thread(new GameWindow(0));
                 t.start();
             }
         });
 
         mainPanel.add(playWithBot);
-        mainPanel.add(joinGameButton);
+        mainPanel.add(replayGame);
         mainPanel.add(startGameButton);
 
         add(mainPanel);

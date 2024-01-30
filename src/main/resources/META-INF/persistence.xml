@@ -20,9 +20,9 @@
         <class>org.client.Client</class>
         <class>org.client.ClientWithBoard</class>
         <class>org.client.ConnectionHandler</class>
-        <class>org.client.ScoreCalculator</class>
+        <class>org.client.calculatePoints.ScoreCalculator</class>
         <class>org.client.StartClient</class>
-        <class>org.client.StoneComponent</class>
+        <class>org.client.clientGameWindows.StoneComponent</class>
         <!-- inne klasy encji, jeśli będą inne -->
 
         <properties>

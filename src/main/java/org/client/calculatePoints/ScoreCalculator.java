@@ -1,17 +1,12 @@
-package org.client;
+package org.client.calculatePoints;
 
-import org.server.gameLogic.IntersectionState;
+import org.constants.ConstantVariables;
 import org.server.gameLogic.Stone;
 import org.server.gameLogic.StoneColor;
 
 import javax.swing.*;
-import java.awt.*;
-import java.util.HashSet;
-import java.util.Set;
 
-import static org.server.gameLogic.Board.size;
-
-class ScoreCalculator {
+public class ScoreCalculator implements ConstantVariables {
     private Stone[][] fields;
     private JLabel ter_B;
     private JLabel ter_W;

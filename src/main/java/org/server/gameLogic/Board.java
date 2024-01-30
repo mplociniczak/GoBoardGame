@@ -1,16 +1,13 @@
 package org.server.gameLogic;
 
+import org.constants.ConstantVariables;
 import org.server.Server;
 
 /**
  * The Board class represents the game board in a Go game. It contains methods for managing the board state,
  * placing stones, and converting the board state to a string representation.
  */
-public class Board {
-    /**
-     * The size of the game board (number of intersections in each dimension).
-     */
-    public static final int size = 19;
+public class Board implements ConstantVariables {
 
     /**
      * 2D array representing the intersections of the game board, each containing a Stone object.

@@ -1,4 +1,4 @@
-package org.client;
+package org.client.clientGameWindows;
 
 import org.server.gameLogic.StoneColor;
 
