@@ -50,8 +50,6 @@ public class ConnectionHandler {
     public void sendCoordinates(int X, int Y){
         try{
             output.writeObject(new Point(X, Y));
-            //output.writeInt(X);
-            //output.writeInt(Y);
             output.flush();
         } catch (IOException ex) {
             //TODO: handle

@@ -19,14 +19,15 @@ public class FloodFill {
         int territoryCount = 0;
         Set<Point> surrounded = new HashSet<>();
         Set<Point> visited = new HashSet<>();
+        Set<Point> globalVisited = new HashSet<>();
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
 
-                if (fields[i][j].getState().equals(IntersectionState.EMPTY) && !visited.contains(new Point(i, j))) {
+                if (fields[i][j].getState().equals(IntersectionState.EMPTY) && !globalVisited.contains(new Point(i, j))) {
 
                     canBeSurrounded = true;
 
-                    checkIfSurrounded(i, j, surrounded, visited, enemyColor, color);
+                    checkIfSurrounded(i, j, surrounded, visited, globalVisited, enemyColor, color);
 
                     visited.clear();
 
@@ -43,7 +44,7 @@ public class FloodFill {
     }
 
     boolean canBeSurrounded = true;
-    private void checkIfSurrounded(int X, int Y, Set<Point> surrounded, Set<Point> visited, StoneColor enemyColor, StoneColor color) {
+    private void checkIfSurrounded(int X, int Y, Set<Point> surrounded, Set<Point> visited, Set<Point> globalVisited, StoneColor enemyColor, StoneColor color) {
 
         if(!isValidCoordinate(X, Y) || !canBeSurrounded) return;
 
@@ -55,18 +56,19 @@ public class FloodFill {
         }
 
         visited.add(new Point(X, Y));
+        globalVisited.add(new Point(X, Y));
 
-        if(!visited.contains(new Point(X+1, Y)))
-            checkIfSurrounded(X+1, Y, surrounded, visited, enemyColor, color);
+        if(!visited.contains(new Point(X+1, Y)) && canBeSurrounded)
+            checkIfSurrounded(X+1, Y, surrounded, visited, globalVisited, enemyColor, color);
 
-        if(!visited.contains(new Point(X-1, Y)))
-            checkIfSurrounded(X-1, Y, surrounded, visited, enemyColor, color);
+        if(!visited.contains(new Point(X-1, Y)) && canBeSurrounded)
+            checkIfSurrounded(X-1, Y, surrounded, visited, globalVisited, enemyColor, color);
 
-        if(!visited.contains(new Point(X, Y+1)))
-            checkIfSurrounded(X, Y+1, surrounded, visited, enemyColor, color);
+        if(!visited.contains(new Point(X, Y+1)) && canBeSurrounded)
+            checkIfSurrounded(X, Y+1, surrounded, visited, globalVisited, enemyColor, color);
 
-        if(!visited.contains(new Point(X, Y-1)))
-            checkIfSurrounded(X, Y-1, surrounded, visited, enemyColor, color);
+        if(!visited.contains(new Point(X, Y-1)) && canBeSurrounded)
+            checkIfSurrounded(X, Y-1, surrounded, visited, globalVisited, enemyColor, color);
 
         if(fields[X][Y].getState().equals(IntersectionState.EMPTY) && canBeSurrounded) {
             surrounded.add(new Point(X, Y));

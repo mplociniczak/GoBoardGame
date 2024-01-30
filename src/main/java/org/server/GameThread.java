@@ -32,6 +32,17 @@ public class GameThread implements Runnable, iGameThread {
         gameDao = new GameDAO();
     }
 
+    private void saveMoveToDatabase(int x, int y, StoneColor color) {
+        Move move = new Move();
+        move.setGame(currentGame);
+        move.setPositionX(x);
+        move.setPositionY(y);
+        move.setStoneColor(color);
+        move.setMoveTime(new Date());
+
+        new MoveDAO().saveMove(move);
+    }
+
     public void sendMove(ObjectOutputStream out, int X, int Y) throws IOException {
         out.writeObject(board.BoardToStringBuilderWithStoneColors(X, Y));
         out.flush();
@@ -42,6 +53,9 @@ public class GameThread implements Runnable, iGameThread {
     private void handleUserInputAndSendBackCoordinates(ObjectInputStream clientInput, StoneColor color) throws IOException, ClassNotFoundException {
 
         coordinates = (Point) clientInput.readObject();
+
+        //TODO: test it
+        saveMoveToDatabase(coordinates.x, coordinates.y, color);
 
         StoneColor enemyColor = (color == StoneColor.BLACK) ? StoneColor.WHITE : StoneColor.BLACK;
 

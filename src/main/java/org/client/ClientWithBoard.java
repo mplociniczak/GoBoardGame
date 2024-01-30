@@ -416,17 +416,6 @@ public class ClientWithBoard extends JFrame implements Runnable {
         }
     }
 
-    private void saveMoveToDatabase(int x, int y, StoneColor color) {
-        Move move = new Move();
-        move.setGame(currentGame);
-        move.setPositionX(x);
-        move.setPositionY(y);
-        move.setStoneColor(color);
-        move.setMoveTime(new Date());
-
-        new MoveDAO().saveMove(move);
-    }
-
     /**
      * Initiates the replay of the game.
      */
