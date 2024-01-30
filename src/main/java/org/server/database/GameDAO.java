@@ -2,6 +2,9 @@ package org.server.database;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+
+import java.util.List;
 
 public class GameDAO {
 
@@ -47,6 +50,16 @@ public class GameDAO {
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             // Pobierz grę o podanym ID
             return session.get(Game.class, gameId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<Game> getAllGames() {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            Query<Game> query = session.createQuery("from Game", Game.class);
+            return query.list();
         } catch (Exception e) {
             e.printStackTrace();
             return null;

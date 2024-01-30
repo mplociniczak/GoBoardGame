@@ -7,6 +7,8 @@ import java.util.Date;
 @Table(name = "game")
 public class Game {
 
+
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -34,6 +36,10 @@ public class Game {
             instance = new Game();
         }
         return instance;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     // Konstruktory, gettery i settery

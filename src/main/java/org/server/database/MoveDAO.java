@@ -3,6 +3,9 @@ package org.server.database;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.util.Collections;
+import java.util.List;
+
 public class MoveDAO {
 
     public void saveMove(Move move) {
@@ -24,6 +27,16 @@ public class MoveDAO {
         }
     }
 
+    public List<Move> getMovesByGameId(Long gameId) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("from Move where game.id = :gameId", Move.class)
+                    .setParameter("gameId", gameId)
+                    .list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return Collections.emptyList();
+        }
+    }
     // Metody do aktualizacji i odczytu ruchów mogą być dodane później
 }
 

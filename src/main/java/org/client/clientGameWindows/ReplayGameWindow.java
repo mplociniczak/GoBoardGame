@@ -1,9 +1,13 @@
 package org.client.clientGameWindows;
 
+import org.server.database.Move;
+import org.server.database.MoveDAO;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
 import static org.constants.ConstantVariables.endgameCode;
 import static org.server.gameLogic.Board.size;
@@ -12,7 +16,17 @@ public class ReplayGameWindow extends JFrame implements Runnable {
 
     private Utils draw;
     private JPanel gameBoardPanel;
-    public ReplayGameWindow(){
+
+    private Long gameId; // ID gry do odtworzenia
+    private List<Move> moves; // Lista ruchów w grze
+    private int currentMoveIndex = 0; // Indeks aktualnego ruchu
+
+    public ReplayGameWindow(Long gameId){
+        this.gameId = gameId;
+
+        // Pobierz ruchy dla gry
+        MoveDAO moveDAO = new MoveDAO();
+        this.moves = moveDAO.getMovesByGameId(gameId);
 
         setTitle("Go Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -85,7 +99,7 @@ public class ReplayGameWindow extends JFrame implements Runnable {
             @Override
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Next");
-                //replayGameForwards();
+                replayGameForwards();
             }
         });
 
@@ -101,11 +115,16 @@ public class ReplayGameWindow extends JFrame implements Runnable {
      * Initiates the replay of the game.
      */
     private void replayGameForwards() {
-        // TODO: we need coordinates and color from database to call a function that updates graphics drawing one stone at every button click
-        //draw.updateStoneGraphics(X, Y, color, gameBoardPanel);
+        if (currentMoveIndex < moves.size()) {
+            Move currentMove = moves.get(currentMoveIndex);
+            // Aktualizuj planszę na podstawie ruchu
+            draw.updateStoneGraphics(currentMove.getPositionX(), currentMove.getPositionY(), currentMove.getStoneColor(), gameBoardPanel);
+            currentMoveIndex++;
+        }
     }
     private void replayGameBackwards(){
         //TODO: idk how to do it
+        //TODO: me neither XD
     }
     @Override
     public void run() {
