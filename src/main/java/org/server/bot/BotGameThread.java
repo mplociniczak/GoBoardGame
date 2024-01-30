@@ -84,8 +84,10 @@ public class BotGameThread implements Runnable, iGameThread {
                 }
 
                 coordinates = bot.makeMove();
-                board.placeStone(coordinates.x, coordinates.y, StoneColor.WHITE, StoneColor.BLACK);
-                sendMove(firstClientOutput, coordinates.x , coordinates.y);
+                playersMove[0] = coordinates.x;
+                playersMove[1] = coordinates.y;
+                board.placeStone(playersMove, StoneColor.WHITE, StoneColor.BLACK);
+                sendMove(firstClientOutput, playersMove[0], playersMove[1]);
 
             }
         } catch(IOException | ClassNotFoundException ex) {
