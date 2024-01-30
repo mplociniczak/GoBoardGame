@@ -6,4 +6,5 @@ import javax.swing.*;
 
 public interface Utils {
     void updateStoneGraphics(int X, int Y, StoneColor color, JPanel gameBoardPanel);
+    void drawEmptyGameBoard(JPanel gameBoardPanel);
 }

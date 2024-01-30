@@ -8,7 +8,7 @@ import java.awt.*;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.server.gameLogic.Board.size;
+import static org.constants.ConstantVariables.*;
 
 public class FloodFill {
     Stone[][] fields;

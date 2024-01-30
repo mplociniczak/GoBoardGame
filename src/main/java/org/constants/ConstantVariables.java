@@ -1,12 +1,13 @@
 package org.constants;
 
-public interface ConstantVariables {
+public final class ConstantVariables {
+    private ConstantVariables(){}
     /**
      * The port number on which the server listens for incoming connections.
      */
-    int port = 6660;
-    int errorCode = -1;
-    int passCode = -2;
-    int endgameCode = -3;
-    int size = 19;
+    public static int port = 6660;
+    public static int errorCode = -1;
+    public static int passCode = -2;
+    public static int endgameCode = -3;
+    public static int size = 19;
 }

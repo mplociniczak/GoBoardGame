@@ -1,6 +1,5 @@
 package org.server.bot;
 
-import org.server.Server;
 import org.server.gameLogic.Board;
 import org.server.gameLogic.StoneColor;
 import org.server.iGameThread;
@@ -10,7 +9,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
-import static org.server.Server.*;
+import static org.constants.ConstantVariables.*;
 
 /**
  * The BotGameThread class represents a thread for a game against a bot.

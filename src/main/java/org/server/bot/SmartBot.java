@@ -4,6 +4,8 @@ import org.server.gameLogic.Board;
 import org.server.gameLogic.IntersectionState;
 import org.server.gameLogic.StoneColor;
 
+import static org.constants.ConstantVariables.*;
+
 import java.awt.*;
 
 /**
@@ -18,8 +20,8 @@ public class SmartBot {
      * @return The Point representing the coordinates of the move.
      */
     public Point makeMove() {
-        for (int i = 0; i < Board.size; i++) {
-            for (int j = 0; j < Board.size; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 if (Board.fields[i][j].getColor().equals(StoneColor.BLACK)) {
                     // Szukamy pustego miejsca dookoła kamienia przeciwnika
                     Point emptyNeighbor = findEmptyNeighbor(i, j);
@@ -71,8 +73,8 @@ public class SmartBot {
     public Point getRandomMove() {
         // Dla uproszczenia, bot wybierze losowe wolne pole
         while (true) {
-            int x = (int) (Math.random() * Board.size);
-            int y = (int) (Math.random() * Board.size);
+            int x = (int) (Math.random() * size);
+            int y = (int) (Math.random() * size);
 
             if (isValidCoordinate(x, y) && Board.fields[x][y].getState().equals(IntersectionState.EMPTY)) {
                 return new Point(x, y);
@@ -88,7 +90,7 @@ public class SmartBot {
      * @return True if the coordinates are valid, false otherwise.
      */
     public boolean isValidCoordinate(int x, int y) {
-        return x >= 0 && x < Board.size && y >= 0 && y < Board.size;
+        return x >= 0 && x < size && y >= 0 && y < size;
     }
 }
 

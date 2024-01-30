@@ -1,8 +1,8 @@
 package org.client.clientGameWindows;
 
+import static org.constants.ConstantVariables.*;
 import org.client.ConnectionHandler;
 import org.client.calculatePoints.ScoreCalculator;
-import org.constants.ConstantVariables;
 import org.server.gameLogic.Stone;
 import org.server.gameLogic.StoneColor;
 
@@ -35,7 +35,7 @@ import java.awt.event.MouseEvent;
  * @author MP, RR
  * @version 1.0
  */
-public class GameWindow extends JFrame implements Runnable, ConstantVariables {
+public class GameWindow extends JFrame implements Runnable{
     private static JPanel gameBoardPanel;
     private JLabel ter_B;  //Territory
     private JLabel ter_W;
@@ -52,7 +52,6 @@ public class GameWindow extends JFrame implements Runnable, ConstantVariables {
     private static Stone[][] fields;
     private ScoreCalculator scoreCalculator; // Add ScoreCalculator instance
     private Utils draw;
-    //private StoneColor currentPlayerColor;
 
     /**
      * Constructs a new {@code GameWindow} with the specified game option.
@@ -64,6 +63,8 @@ public class GameWindow extends JFrame implements Runnable, ConstantVariables {
         setTitle("Go Game");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(900, 550);
+
+        draw = new DrawingUtils();
 
         this.gameOption = gameOption;
 
@@ -82,11 +83,7 @@ public class GameWindow extends JFrame implements Runnable, ConstantVariables {
 
         setVisible(true);
 
-        //currentPlayerColor = StoneColor.BLACK;
-
         scoreCalculator = new ScoreCalculator(fields, ter_B, ter_W, pris_B, pris_W, scr_B, scr_W);
-
-        draw = new DrawingUtils();
     }
 
     /**
@@ -102,33 +99,34 @@ public class GameWindow extends JFrame implements Runnable, ConstantVariables {
 
         gameBoardPanel.addMouseListener(new ClickListener());
 
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                JPanel square = new JPanel() {
+        draw.drawEmptyGameBoard(gameBoardPanel);
 
-                    @Override
-                    protected void paintComponent(Graphics g) {
-                        super.paintComponent(g);
-
-                        Graphics2D g2d = (Graphics2D) g;
-                        g2d.setColor(Color.BLACK);
-
-                        // Grubsza linia pionowa na środku kwadratu
-                        g2d.setStroke(new BasicStroke(2.0f));
-                        g2d.drawLine(getWidth() / 2, 0, getWidth() / 2, getHeight());
-
-                        // Grubsza linia pozioma na środku kwadratu
-                        g2d.drawLine(0, getHeight() / 2, getWidth(), getHeight() / 2);
-                    }
-                };
-
-                square.setBackground(Color.ORANGE);
-
-                square.setPreferredSize(new Dimension(25, 25));
-
-                gameBoardPanel.add(square);
-            }
-        }
+//        for (int i = 0; i < size; i++) {
+//            for (int j = 0; j < size; j++) {
+//                JPanel square = new JPanel() {
+//                    @Override
+//                    protected void paintComponent(Graphics g) {
+//                        super.paintComponent(g);
+//
+//                        Graphics2D g2d = (Graphics2D) g;
+//                        g2d.setColor(Color.BLACK);
+//
+//                        // Grubsza linia pionowa na środku kwadratu
+//                        g2d.setStroke(new BasicStroke(2.0f));
+//                        g2d.drawLine(getWidth() / 2, 0, getWidth() / 2, getHeight());
+//
+//                        // Grubsza linia pozioma na środku kwadratu
+//                        g2d.drawLine(0, getHeight() / 2, getWidth(), getHeight() / 2);
+//                    }
+//                };
+//
+//                square.setBackground(Color.ORANGE);
+//
+//                square.setPreferredSize(new Dimension(25, 25));
+//
+//                gameBoardPanel.add(square);
+//            }
+//        }
 
         splitPane.setLeftComponent(gameBoardPanel);
 
@@ -261,13 +259,6 @@ public class GameWindow extends JFrame implements Runnable, ConstantVariables {
                 fields[i][j].setColor(StoneColor.valueOf(receivedString[ctr++]));
             }
         }
-
-        // Zmiana aktualnego koloru gracza na przeciwny po wykonanym ruchu
-//        if (color == StoneColor.BLACK) {
-//            currentPlayerColor = StoneColor.WHITE;
-//        } else {
-//            currentPlayerColor = StoneColor.BLACK;
-//        }
 
         //Incorrect move
         if(X == errorCode) {

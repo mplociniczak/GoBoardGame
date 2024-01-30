@@ -1,11 +1,12 @@
 package org.client.clientGameWindows;
 
-import org.constants.ConstantVariables;
+import static org.constants.ConstantVariables.*;
 import org.server.gameLogic.StoneColor;
 
 import javax.swing.*;
+import java.awt.*;
 
-public class DrawingUtils implements Utils, ConstantVariables {
+public class DrawingUtils implements Utils{
 
     /**
      * Updates the graphical representation of a stone on the game board.
@@ -46,5 +47,35 @@ public class DrawingUtils implements Utils, ConstantVariables {
         centralSquare.revalidate();
         centralSquare.repaint();
 
+    }
+
+    @Override
+    public void drawEmptyGameBoard(JPanel gameBoardPanel) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                JPanel square = new JPanel() {
+                    @Override
+                    protected void paintComponent(Graphics g) {
+                        super.paintComponent(g);
+
+                        Graphics2D g2d = (Graphics2D) g;
+                        g2d.setColor(Color.BLACK);
+
+                        // Grubsza linia pionowa na środku kwadratu
+                        g2d.setStroke(new BasicStroke(2.0f));
+                        g2d.drawLine(getWidth() / 2, 0, getWidth() / 2, getHeight());
+
+                        // Grubsza linia pozioma na środku kwadratu
+                        g2d.drawLine(0, getHeight() / 2, getWidth(), getHeight() / 2);
+                    }
+                };
+
+                square.setBackground(Color.ORANGE);
+
+                square.setPreferredSize(new Dimension(25, 25));
+
+                gameBoardPanel.add(square);
+            }
+        }
     }
 }

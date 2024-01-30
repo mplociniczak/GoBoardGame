@@ -8,7 +8,7 @@ import java.awt.*;
 import java.io.*;
 import java.util.Date;
 
-import static org.server.Server.*;
+import static org.constants.ConstantVariables.*;
 
 public class GameThread implements Runnable, iGameThread {
     private final static int first = 1;

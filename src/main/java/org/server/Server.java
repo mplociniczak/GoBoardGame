@@ -1,18 +1,17 @@
 package org.server;
 
-import org.constants.ConstantVariables;
+import static org.constants.ConstantVariables.*;
 import org.server.bot.BotGameThread;
 
 import java.io.*;
 import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.ArrayList;
 
 /**
  * The Server class represents the main server for a simple Go game.
  * It listens for incoming client connections and creates separate game threads for each pair of clients.
  */
-public class Server implements ConstantVariables {
+public class Server {
 
     /**
      * The main method of the Server class, responsible for accepting client connections

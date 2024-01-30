@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.constants.ConstantVariables.*;
 import static org.server.deepCopy.DeepCopy.deepCopy;
 import static org.server.gameLogic.Board.*;
 

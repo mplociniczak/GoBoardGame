@@ -1,13 +1,13 @@
 package org.server.gameLogic;
 
-import org.constants.ConstantVariables;
+import static org.constants.ConstantVariables.*;
 import org.server.Server;
 
 /**
  * The Board class represents the game board in a Go game. It contains methods for managing the board state,
  * placing stones, and converting the board state to a string representation.
  */
-public class Board implements ConstantVariables {
+public class Board{
 
     /**
      * 2D array representing the intersections of the game board, each containing a Stone object.
@@ -78,13 +78,12 @@ public class Board implements ConstantVariables {
     }
     boolean isMoveValid;
     public void placeStone(int[] coordinates, StoneColor color, StoneColor enemyColor) {
-        //fields[coordinates[0]][coordinates[1]].placeStone(color);
 
         isMoveValid = buildBoard.searchForAdjacentEnemyStones(coordinates[0], coordinates[1], enemyColor, color);
 
         if(!isMoveValid || !buildBoard.isStoneBreathing(coordinates[0], coordinates[1])) {
-            coordinates[0] = Server.errorCode;
-            coordinates[1] = Server.errorCode;
+            coordinates[0] = errorCode;
+            coordinates[1] = errorCode;
         }
     }
 }
