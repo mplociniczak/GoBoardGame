@@ -120,12 +120,18 @@ public class ReplayGameWindow extends JFrame implements Runnable {
             // Aktualizuj planszę na podstawie ruchu
             draw.updateStoneGraphics(currentMove.getPositionX(), currentMove.getPositionY(), currentMove.getStoneColor(), gameBoardPanel);
             currentMoveIndex++;
+        } else {
+            // Wyświetl komunikat, gdy nie ma więcej ruchów do odtworzenia
+            JOptionPane.showMessageDialog(this, "Wszystkie ruchy zostały odtworzone. Nie ma więcej ruchów do wyświetlenia.", "Koniec ruchów", JOptionPane.INFORMATION_MESSAGE);
         }
+
     }
+
     private void replayGameBackwards(){
         //TODO: idk how to do it
         //TODO: me neither XD
     }
+
     @Override
     public void run() {
 
