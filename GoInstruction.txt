@@ -1,0 +1,7 @@
+https://github.com/rrubaszek/GoBoardGame.git
+
+Najpierw trzeba odpalić serwer org.server.Server. Następnie odpalamy klienta z klasy org.client.StartClient. Wybieramy dostępną opcje gry. Aby zagrać grę multiplayer trzeba odpalić 2 klientów.
+
+Połączenie z bazą danych nie będzie możliwe, dopóki nie będzie postawiona na tym samym urządzeniu co serwer lub połączona przez odpowiedni adres IP i włączona. 
+
+Autorzy: Marta Płóciniczak, Robert Rubaszek
