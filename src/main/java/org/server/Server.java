@@ -29,17 +29,10 @@ public class Server {
             serverSocket = new ServerSocket(port);
             System.out.println("Server is listening on port " + port);
 
-        } catch (IOException ex) {
-            System.out.println("server exception" + ex.getMessage());
-        }
+           while(true) {
 
-
-        while(true) {
-            try {
-                //Client creates a new game, each game has separate thread
                 ClientServerConnectionManager client = new ClientServerConnectionManager();
 
-                assert serverSocket != null;
                 client.initializeSocket(serverSocket);
 
                 int mode = client.gameMode();
@@ -64,9 +57,10 @@ public class Server {
                     waitingClients.clear();
                 }
 
-            } catch (IOException e) {
-                System.out.println("I/O error");
-            }
+           }
+
+        } catch (IOException e) {
+            System.out.println("I/O error");
         }
     }
 }

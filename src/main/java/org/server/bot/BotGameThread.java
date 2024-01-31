@@ -102,7 +102,7 @@ public class BotGameThread implements Runnable, iGameThread {
             System.out.println("Game ended");
 
         } catch(IOException | ClassNotFoundException ex) {
-            ex.getMessage();
+            System.out.println("IOException or class not found");
         }
     }
 }

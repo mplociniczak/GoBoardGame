@@ -58,20 +58,14 @@ public class ReplayGameWindow extends JFrame implements Runnable {
         JButton previous = new JButton("Prevoius move");
         JButton next = new JButton("Next move");
 
-        previous.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Previous");
-                replayGameBackwards();
-            }
+        previous.addActionListener(e -> {
+            System.out.println("Previous");
+            replayGameBackwards();
         });
 
-        next.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Next");
-                replayGameForwards();
-            }
+        next.addActionListener(e -> {
+            System.out.println("Next");
+            replayGameForwards();
         });
 
         scorePanel.add(previous);

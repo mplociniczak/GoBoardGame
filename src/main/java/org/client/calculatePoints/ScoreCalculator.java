@@ -5,7 +5,6 @@ import org.server.gameLogic.Stone;
 import javax.swing.*;
 
 public class ScoreCalculator{
-    private Stone[][] fields;
     private JLabel ter_B;
     private JLabel ter_W;
     private JLabel pris_B;
@@ -21,7 +20,6 @@ public class ScoreCalculator{
         this.pris_W = pris_W;
         this.scr_B = scr_B;
         this.scr_W = scr_W;
-        this.fields = fields;
 
         ff = new FloodFill(fields);
     }

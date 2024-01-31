@@ -149,27 +149,21 @@ public class GameWindow extends JFrame implements Runnable{
 
         scorePanel.add(pass);
 
-        pass.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(myTurn) {
-                    connection.sendCoordinates(passCode, passCode);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Not your turn", null, JOptionPane.PLAIN_MESSAGE);
-                }
+        pass.addActionListener(e -> {
+            if(myTurn) {
+                connection.sendCoordinates(passCode, passCode);
+            } else {
+                JOptionPane.showMessageDialog(null, "Not your turn", null, JOptionPane.PLAIN_MESSAGE);
             }
         });
 
         scorePanel.add(resign);
 
-        resign.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if(myTurn) {
-                    connection.sendCoordinates(endgameCode, endgameCode);
-                } else {
-                    JOptionPane.showMessageDialog(null, "Not your turn", null, JOptionPane.PLAIN_MESSAGE);
-                }
+        resign.addActionListener(e -> {
+            if(myTurn) {
+                connection.sendCoordinates(endgameCode, endgameCode);
+            } else {
+                JOptionPane.showMessageDialog(null, "Not your turn", null, JOptionPane.PLAIN_MESSAGE);
             }
         });
 

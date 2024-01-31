@@ -82,7 +82,7 @@ public class GameThread implements Runnable, iGameThread {
         } else if (board.buildBoard.isIntersectionEmpty(coordinates.x, coordinates.y)) {
 
             playersMove[0] = coordinates.x;
-            playersMove[1] = coordinates.y;;
+            playersMove[1] = coordinates.y;
 
             board.placeStone(playersMove, color, enemyColor);
 
