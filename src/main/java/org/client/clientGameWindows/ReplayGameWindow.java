@@ -12,7 +12,6 @@ import java.util.List;
 import static org.constants.ConstantVariables.*;
 
 public class ReplayGameWindow extends JFrame implements Runnable {
-
     private Utils draw;
     private JPanel gameBoardPanel;
     private Long gameId; // ID gry do odtworzenia
@@ -121,9 +120,6 @@ public class ReplayGameWindow extends JFrame implements Runnable {
             JOptionPane.showMessageDialog(this, "Wszystkie ruchy zostały cofnięte. Nie ma więcej ruchów do wyświetlenia.", "Koniec ruchów", JOptionPane.INFORMATION_MESSAGE);
         }
     }
-
     @Override
-    public void run() {
-
-    }
+    public void run() {}
 }

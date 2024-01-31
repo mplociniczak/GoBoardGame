@@ -1,7 +1,5 @@
 package org.server.gameLogic;
 
-import org.server.gameLogic.StoneColor;
-
 import java.awt.*;
 import java.util.Set;
 

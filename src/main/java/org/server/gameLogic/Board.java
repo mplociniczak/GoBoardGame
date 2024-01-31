@@ -1,7 +1,6 @@
 package org.server.gameLogic;
 
 import static org.constants.ConstantVariables.*;
-import org.server.Server;
 
 /**
  * The Board class represents the game board in a Go game. It contains methods for managing the board state,
@@ -22,7 +21,6 @@ public class Board{
     /**
      * Constructs a new Board object, initializing the game board and using a BuildStandardBoard object.
      */
-
     public Board(){
         fields = new Stone[size][size];
         for (int i = 0; i < size; i++) {
@@ -79,7 +77,7 @@ public class Board{
     boolean isMoveValid;
     public void placeStone(int[] coordinates, StoneColor color, StoneColor enemyColor) {
 
-        isMoveValid = buildBoard.searchForAdjacentEnemyStones(coordinates[0], coordinates[1], enemyColor, color);
+        isMoveValid = buildBoard.searchForAdjacentEnemyStones(coordinates[0], coordinates[1], color, enemyColor);
 
         if(!isMoveValid || !buildBoard.isStoneBreathing(coordinates[0], coordinates[1])) {
             coordinates[0] = errorCode;

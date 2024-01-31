@@ -26,7 +26,6 @@ public class SmartBot {
                     // Szukamy pustego miejsca dookoła kamienia przeciwnika
                     Point emptyNeighbor = findEmptyNeighbor(i, j);
                     if (emptyNeighbor != null) {
-                        Board.fields[emptyNeighbor.x][emptyNeighbor.y].placeStone(StoneColor.WHITE);
                         return emptyNeighbor;
                     }
                 }
@@ -34,9 +33,7 @@ public class SmartBot {
         }
 
         // Jeśli nie udało się znaleźć odpowiedniego ruchu, wykonujemy losowy ruch
-        Point random = getRandomMove();
-        Board.fields[random.x][random.y].placeStone(StoneColor.WHITE);
-        return random;
+        return getRandomMove();
     }
 
     /**

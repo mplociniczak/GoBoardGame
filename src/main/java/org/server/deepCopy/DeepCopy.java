@@ -5,6 +5,7 @@ import org.server.gameLogic.Stone;
 public class DeepCopy {
 
     public static Stone[][] deepCopy(Stone[][] original) {
+
         if(original == null) {
             return null;
         }

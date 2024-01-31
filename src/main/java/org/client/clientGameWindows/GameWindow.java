@@ -1,6 +1,7 @@
 package org.client.clientGameWindows;
 
 import static org.constants.ConstantVariables.*;
+
 import org.client.ConnectionHandler;
 import org.client.calculatePoints.ScoreCalculator;
 import org.server.gameLogic.Stone;
@@ -12,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+
 
 
 /**
@@ -49,6 +51,8 @@ public class GameWindow extends JFrame implements Runnable{
     private final static int secondPlayer = 2;
     private final ConnectionHandler connection;
     private boolean myTurn;
+    private int blackStonesRemoved = 0;
+    private int whiteStonesRemoved = 0;
     private static Stone[][] fields;
     private ScoreCalculator scoreCalculator; // Add ScoreCalculator instance
     private Utils draw;
@@ -68,12 +72,15 @@ public class GameWindow extends JFrame implements Runnable{
 
         this.gameOption = gameOption;
 
-        connection = new ConnectionHandler("localhost", port, gameOption);
+        connection = new ConnectionHandler(address, port, gameOption);
 
         fields = new Stone[size][size];
+
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
+
                 fields[i][j] = new Stone();
+
             }
         }
 
@@ -90,43 +97,16 @@ public class GameWindow extends JFrame implements Runnable{
      * Creates the graphical user interface components, including the game board, score panel, and buttons.
      */
     private void createUI() {
+
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
         splitPane.setDividerSize(0);
 
         gameBoardPanel = new JPanel();
         gameBoardPanel.setLayout(new GridLayout(size, size));
         gameBoardPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 1));
-
         gameBoardPanel.addMouseListener(new ClickListener());
 
         draw.drawEmptyGameBoard(gameBoardPanel);
-
-//        for (int i = 0; i < size; i++) {
-//            for (int j = 0; j < size; j++) {
-//                JPanel square = new JPanel() {
-//                    @Override
-//                    protected void paintComponent(Graphics g) {
-//                        super.paintComponent(g);
-//
-//                        Graphics2D g2d = (Graphics2D) g;
-//                        g2d.setColor(Color.BLACK);
-//
-//                        // Grubsza linia pionowa na środku kwadratu
-//                        g2d.setStroke(new BasicStroke(2.0f));
-//                        g2d.drawLine(getWidth() / 2, 0, getWidth() / 2, getHeight());
-//
-//                        // Grubsza linia pozioma na środku kwadratu
-//                        g2d.drawLine(0, getHeight() / 2, getWidth(), getHeight() / 2);
-//                    }
-//                };
-//
-//                square.setBackground(Color.ORANGE);
-//
-//                square.setPreferredSize(new Dimension(25, 25));
-//
-//                gameBoardPanel.add(square);
-//            }
-//        }
 
         splitPane.setLeftComponent(gameBoardPanel);
 
@@ -136,14 +116,15 @@ public class GameWindow extends JFrame implements Runnable{
         pris_W = new JLabel();
         scr_B = new JLabel();
         scr_W = new JLabel();
+
         JButton pass = new JButton("Pass");
         JButton resign = new JButton("Resign");
 
         JPanel scorePanel = new JPanel();
         scorePanel.setLayout(new GridLayout(5, 3)); // Two columns
         scorePanel.setBackground(Color.LIGHT_GRAY);
-
         scorePanel.add(new JLabel());           //Upper left corner of the scorePanel is empty
+
         JLabel black = new JLabel("Black");
         Font font = new Font(black.getFont().getFontName(), Font.BOLD, 16);
         black.setFont(font);
@@ -217,13 +198,17 @@ public class GameWindow extends JFrame implements Runnable{
     }
 
 
+    boolean[][] visitedAndCalculatedTerritory = new boolean[size][size];
     /**
      * Removes stones marked as "REMOVED" from the game board.
      */
-    private void removeStoneFromBoard() {
+    private void removeStoneFromBoard(StoneColor color) {
+
         for(int i = 0; i < size; i++) {
             for(int j = 0; j < size; j++) {
+
                 if(fields[i][j].getColor().equals(StoneColor.REMOVED)) {
+
                     JPanel centralSquare = (JPanel) gameBoardPanel.getComponent(j * size + i);
 
                     centralSquare.removeAll();
@@ -231,6 +216,14 @@ public class GameWindow extends JFrame implements Runnable{
                     centralSquare.revalidate();
 
                     centralSquare.repaint();
+
+                    if(color.equals(StoneColor.BLACK) && !visitedAndCalculatedTerritory[i][j]) {
+                        whiteStonesRemoved++;
+                    } else if (color.equals(StoneColor.WHITE) && !visitedAndCalculatedTerritory[i][j]){
+                        blackStonesRemoved++;
+                    }
+
+                    visitedAndCalculatedTerritory[i][j] = true;
                 }
             }
         }
@@ -243,6 +236,7 @@ public class GameWindow extends JFrame implements Runnable{
      * @param color The color of the stone to be placed.
      */
     private void receiveCoordinatesAndPlaceStone(StoneColor color){
+
         StringBuilder receivedCoordinates = connection.receiveCoordinates();
 
         String[] receivedString = receivedCoordinates.toString().split(" ");
@@ -274,7 +268,7 @@ public class GameWindow extends JFrame implements Runnable{
         } else if(X == endgameCode) {
 
             terminateGame = true;
-            scoreCalculator.updateScoreLabels();
+            scoreCalculator.updateScoreLabels(blackStonesRemoved, whiteStonesRemoved);
 
             if(Y != endgameCode) {
 
@@ -290,7 +284,7 @@ public class GameWindow extends JFrame implements Runnable{
 
             draw.updateStoneGraphics(X, Y, color, gameBoardPanel);
 
-            removeStoneFromBoard();
+            removeStoneFromBoard(color);
 
         }
 
@@ -339,17 +333,22 @@ public class GameWindow extends JFrame implements Runnable{
         }
         //Game with bot
         else if(gameOption == 1) {
+
             myTurn = true;
 
-            while(!terminateGame) {
+            while(true) {
 
                 receiveCoordinatesAndPlaceStone(StoneColor.BLACK);
+
+                if(terminateGame) break;
 
                 receiveCoordinatesAndPlaceStone(StoneColor.WHITE);
 
                 myTurn = true;
             }
+
             System.out.println("Game ended");
+
         }
     }
 

@@ -48,21 +48,32 @@ public class BotGameThread implements Runnable, iGameThread {
         out.flush();
     }
 
+    Point coordinates = new Point();
+    int[] playersMove = new int[2];
     /**
      * Runs the BotGameThread, handling the game logic and communication with the first client.
      */
     @Override
     public void run() {
         try {
-            Point coordinates;
-
-            int[] playersMove = new int[2];
 
             while(true) {
 
                 coordinates = (Point) firstClientInput.readObject();
 
-                if (board.buildBoard.isValidCoordinate(coordinates.x, coordinates.y) && board.buildBoard.isIntersectionEmpty(coordinates.x, coordinates.y)) {
+                if (coordinates.x == endgameCode) {
+
+                    sendMove(firstClientOutput, endgameCode, 2);
+
+                    break;
+
+                } else if (coordinates.x == passCode) {
+
+                    sendMove(firstClientOutput, endgameCode, endgameCode);
+
+                    break;
+
+                } else if (board.buildBoard.isValidCoordinate(coordinates.x, coordinates.y) && board.buildBoard.isIntersectionEmpty(coordinates.x, coordinates.y)) {
 
                     playersMove[0] = coordinates.x;
                     playersMove[1] = coordinates.y;
@@ -71,23 +82,25 @@ public class BotGameThread implements Runnable, iGameThread {
 
                     sendMove(firstClientOutput, playersMove[0], playersMove[1]);
 
-                } else if (coordinates.x == passCode) {
-
-                    sendMove(firstClientOutput, endgameCode, endgameCode);
-
-                    break;
-
-                } else {
+                }  else {
 
                     sendMove(firstClientOutput, errorCode, errorCode);
 
                 }
 
                 coordinates = bot.makeMove();
-                board.placeStone(coordinates.x, coordinates.y, StoneColor.WHITE, StoneColor.BLACK);
-                sendMove(firstClientOutput, coordinates.x , coordinates.y);
+
+                playersMove[0] = coordinates.x;
+                playersMove[1] = coordinates.y;
+
+                board.placeStone(playersMove, StoneColor.WHITE, StoneColor.BLACK);
+
+                sendMove(firstClientOutput, playersMove[0] , playersMove[1]);
 
             }
+
+            System.out.println("Game ended");
+
         } catch(IOException | ClassNotFoundException ex) {
             ex.getMessage();
         }

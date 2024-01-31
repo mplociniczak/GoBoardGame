@@ -21,5 +21,4 @@ public class ClientServerConnectionManager {
     public int gameMode() throws IOException {
         return clientInput.readInt();
     }
-
 }

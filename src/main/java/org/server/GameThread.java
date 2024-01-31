@@ -55,7 +55,6 @@ public class GameThread implements Runnable, iGameThread {
 
         coordinates = (Point) clientInput.readObject();
 
-        //TODO: test it
         saveMoveToDatabase(coordinates.x, coordinates.y, color);
 
         StoneColor enemyColor = (color == StoneColor.BLACK) ? StoneColor.WHITE : StoneColor.BLACK;
@@ -116,7 +115,6 @@ public class GameThread implements Runnable, iGameThread {
         System.out.println("Running...");
 
         // zapisywanie do bazy przy rozpoczęciu gry
-
         currentGame = Game.getInstance();
         currentGame.setStartTime(new Date());
         gameDao.saveGame(currentGame);
@@ -160,7 +158,6 @@ public class GameThread implements Runnable, iGameThread {
         }
 
         // Przy zakończeniu gry
-
         currentGame.setEndTime(new Date());
         gameDao.updateGame(currentGame);
 

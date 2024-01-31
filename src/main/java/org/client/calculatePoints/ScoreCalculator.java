@@ -1,8 +1,6 @@
 package org.client.calculatePoints;
 
-import static org.constants.ConstantVariables.*;
 import org.server.gameLogic.Stone;
-import org.server.gameLogic.StoneColor;
 
 import javax.swing.*;
 
@@ -24,44 +22,31 @@ public class ScoreCalculator{
         this.scr_B = scr_B;
         this.scr_W = scr_W;
         this.fields = fields;
+
         ff = new FloodFill(fields);
     }
 
-    public void updateScoreLabels() {
+    public void updateScoreLabels(int whiteStonesRemoved, int blackStonesRemoved) {
+
         SwingUtilities.invokeLater(() -> {
 
-            int blackTerritory = ff.calculateTerritory(StoneColor.BLACK, StoneColor.WHITE);
-            int whiteTerritory = ff.calculateTerritory(StoneColor.WHITE, StoneColor.BLACK);
+            int[] results = new int[2];
 
-            int blackPrisoners = countPrisoners(StoneColor.BLACK);
-            int whitePrisoners = countPrisoners(StoneColor.WHITE);
+            ff.countTerritory(results);
 
-            int blackScore = blackTerritory + blackPrisoners;
-            int whiteScore = whiteTerritory + whitePrisoners;
+            int blackTerritory = results[0];
+            int whiteTerritory = results[1];
+
+            int blackScore = blackTerritory + blackStonesRemoved;
+            int whiteScore = whiteTerritory + whiteStonesRemoved;
 
             // Update JLabels with the calculated scores
             ter_B.setText(String.valueOf(blackTerritory));
             ter_W.setText(String.valueOf(whiteTerritory));
-            pris_B.setText(String.valueOf(blackPrisoners));
-            pris_W.setText(String.valueOf(whitePrisoners));
+            pris_B.setText(String.valueOf(blackStonesRemoved));
+            pris_W.setText(String.valueOf(whiteStonesRemoved));
             scr_B.setText(String.valueOf(blackScore));
             scr_W.setText(String.valueOf(whiteScore));
         });
     }
-
-    private int countPrisoners(StoneColor color) {
-        int prisonerCount = 0;
-
-        for (int i = 0; i < size; i++) {
-            for (int j = 0; j < size; j++) {
-                if (fields[i][j].getColor().equals(StoneColor.REMOVED)) {
-                    // Increment the prisoner count for stones of the specified color marked as prisoners
-                    prisonerCount++;
-                }
-            }
-        }
-
-        return prisonerCount;
-    }
-
 }

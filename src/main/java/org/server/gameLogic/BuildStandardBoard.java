@@ -106,14 +106,14 @@ public class BuildStandardBoard extends BoardBuilder {
      * @param allyColor  The color of the ally stones.
      */
     @Override
-    public boolean searchForAdjacentEnemyStones(int X, int Y, StoneColor enemyColor, StoneColor allyColor) {
+    public boolean searchForAdjacentEnemyStones(int X, int Y, StoneColor allyColor, StoneColor enemyColor) {
         localFields = deepCopy(fields);
         localFields[X][Y].placeStone(allyColor);
 
-        stoneRemover(X+1, Y, enemyColor, allyColor);
-        stoneRemover(X-1, Y, enemyColor, allyColor);
-        stoneRemover(X, Y+1, enemyColor, allyColor);
-        stoneRemover(X, Y-1, enemyColor, allyColor);
+        stoneRemover(X+1, Y, allyColor, enemyColor);
+        stoneRemover(X-1, Y, allyColor, enemyColor);
+        stoneRemover(X, Y+1, allyColor, enemyColor);
+        stoneRemover(X, Y-1, allyColor, enemyColor);
 
         return checkKoRule();
     }
@@ -127,7 +127,7 @@ public class BuildStandardBoard extends BoardBuilder {
      * @param allyColor  The color of the ally stones.
      */
     @Override
-    public void stoneRemover(int X, int Y, StoneColor enemyColor, StoneColor allyColor) {
+    public void stoneRemover(int X, int Y, StoneColor allyColor, StoneColor enemyColor) {
         Set<Point> surroundedStones = new HashSet<>();
         Set<Point> visited = new HashSet<>();
 
