@@ -80,7 +80,7 @@ public class ReplayGameWindow extends JFrame implements Runnable {
      * Initiates the replay of the game.
      */
     private void replayGameForwards() {
-        if (currentMoveIndex < moves.size()) {
+        if (currentMoveIndex < moves.size() - 1) {
             Move currentMove = moves.get(currentMoveIndex);
             // Aktualizuj planszę na podstawie ruchu
             draw.updateStoneGraphics(currentMove.getPositionX(), currentMove.getPositionY(), currentMove.getStoneColor(), gameBoardPanel);
