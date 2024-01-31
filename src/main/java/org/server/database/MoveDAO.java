@@ -37,6 +37,5 @@ public class MoveDAO {
             return Collections.emptyList();
         }
     }
-    // Metody do aktualizacji i odczytu ruchów mogą być dodane później
 }
 

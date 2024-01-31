@@ -80,16 +80,24 @@ public class ReplayGameWindow extends JFrame implements Runnable {
      * Initiates the replay of the game.
      */
     private void replayGameForwards() {
-        if (currentMoveIndex < moves.size() - 1) {
+        if (currentMoveIndex < moves.size()) {
             Move currentMove = moves.get(currentMoveIndex);
-            // Aktualizuj planszę na podstawie ruchu
-            draw.updateStoneGraphics(currentMove.getPositionX(), currentMove.getPositionY(), currentMove.getStoneColor(), gameBoardPanel);
-            currentMoveIndex++;
-        } else {
+            int currentXCoordinate = currentMove.getPositionX(); // Pobierz współrzędną X dla bieżącego ruchu
+
+            if (currentXCoordinate >= 0) { // Sprawdź, czy współrzędna X nie jest ujemna
+                // Aktualizuj planszę na podstawie ruchu
+                draw.updateStoneGraphics(currentXCoordinate, currentMove.getPositionY(), currentMove.getStoneColor(), gameBoardPanel);
+                currentMoveIndex++; // Inkrementacja indeksu po użyciu, aby uniknąć błędu przy ostatnim ruchu
+            } else {
+                // Współrzędna X jest ujemna, obsłuż tę sytuację
+                JOptionPane.showMessageDialog(this, "Wszystkie ruchy zostały odtworzone. Nie ma więcej ruchów do wyświetlenia.", "Koniec ruchów", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+        if (currentMoveIndex >= moves.size()) {
             // Wyświetl komunikat, gdy nie ma więcej ruchów do odtworzenia
             JOptionPane.showMessageDialog(this, "Wszystkie ruchy zostały odtworzone. Nie ma więcej ruchów do wyświetlenia.", "Koniec ruchów", JOptionPane.INFORMATION_MESSAGE);
         }
-
     }
 
     private void replayGameBackwards() {
